@@ -1,0 +1,19 @@
+#!/bin/sh
+
+USER=$1
+
+if [ $2 ]; then
+	DAYS=$2
+else
+	DAYS=7
+fi
+
+echo "Deleting everything before $DAYS days ago for user $USER"
+
+echo "Running grab.py to get your history..."
+python2 grab.py $USER || exit 1
+
+echo "Running kill.py to annihilate your history..."
+python2 kill.py $DAYS || exit 1
+
+echo "Everything seemed to run successfully."

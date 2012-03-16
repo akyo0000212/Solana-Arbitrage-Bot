@@ -8,7 +8,7 @@ obscure the author (replaces with [deleted]) which is not good enough for some p
 
 Usage
 -----------
-python2 shreddit.py UserName
+./shreddit UserName
 
 Caveats
 -----------

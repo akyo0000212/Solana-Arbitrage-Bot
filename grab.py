@@ -2,7 +2,7 @@
 
 import sys
 from json import loads, dumps
-from urllib2 import urlopen
+from urllib2 import urlopen, HTTPError
 from time import sleep
 
 if len(sys.argv) != 2:
@@ -16,12 +16,18 @@ after = ''
 init_url = 'http://www.reddit.com/user/{user}/comments/.json?after=%s'.format(user=user)
 next_url = init_url % after
 
-http = urlopen(next_url).read()
-json = loads(http)
+try:
+    http = urlopen(next_url).read()
+except HTTPError:
+    raise HTTPError("You seem to have given an invalid user")
+
+try:
+    json = loads(http)
+except ValueError:
+    raise ValueError("Failed to decode json.")
 
 datum = []
 while True:
-    print "Grabing IDs for after: ", after
     after = json['data']['after']
     children = json['data']['children']
 
@@ -37,9 +43,7 @@ while True:
     next_url = init_url % after
     http = urlopen(next_url).read()
     json = loads(http)
-    sleep(2) # don't want to hammer reddit to hard
-
-print "Script collected all available data."
+    sleep(1) # don't want to hammer reddit to hard
 
 f = open('data.json', 'w')
 f.write(dumps(datum))
