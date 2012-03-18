@@ -42,6 +42,5 @@ while True:
     reddit = json.load(http)
     sleep(1)
 
-f = open('data.json', 'w')
-json.dump(datum, f)
-f.close()
+with open('data.json', 'w') as f:
+    json.dump(datum, f)
