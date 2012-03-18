@@ -8,7 +8,8 @@ obscure the author (replaces with [deleted]) which is not good enough for some p
 
 Usage
 -----------
-./shreddit UserName Days
+- Add your Reddit details to user.json in format {'user': 'blaaaaaaaaaaaaaaaah', ...}
+- run `./schreddit`
 
 Caveats
 -----------
