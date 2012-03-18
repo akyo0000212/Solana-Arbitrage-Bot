@@ -52,16 +52,16 @@ for dat in deletion_ids:
     subreddit = dat['subreddit']
     text = dat[u'body'][:20]
 
-    print '{time} {subreddit}: "{text}..."'.format(subreddit=subreddit, id=id, time=time, text=text)
+    print '{id}: {time} {subreddit}: "{text}..."'.format(subreddit=subreddit, id=id, time=time, text=text)
     # And now for the deleting
     conn = httplib.HTTPConnection('www.reddit.com')
     params = urllib.urlencode({
-        'id': dat['id'],
+        'id': id,
         'uh': modhash,
         'api_type': 'json'})
     conn.request('POST', '/api/del', params, headers)
     http = conn.getresponse()
-    if http.read() != '{}':
-        print '''Failed to delete "%s" (%s - %s - %s)''' % (text, id, time, subreddit)
-    break # Still in-testing
+    print http.read()  
+    #print '''Failed to delete "%s" (%s - %s - %s)''' % (text, id, time, subreddit)
+    break
     sleep(2)
