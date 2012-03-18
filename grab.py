@@ -1,7 +1,8 @@
 #!/usr/bin/env python2
 
 import sys
-import json # from json import loads, dumps
+try: import json
+except ImportError: import simplejson as json
 from urllib2 import urlopen, HTTPError
 from time import sleep
 
@@ -15,15 +16,8 @@ after = ''
 init_url = 'http://www.reddit.com/user/{user}/comments/.json?after=%s'.format(user=user)
 next_url = init_url % after
 
-try:
-    http = urlopen(next_url)
-except HTTPError:
-    raise HTTPError("You seem to have given an invalid user")
-
-try:
-    reddit = json.load(http)
-except ValueError:
-    raise ValueError("Failed to decode json.")
+http = urlopen(next_url)
+reddit = json.load(http)
 
 datum = []
 while True:

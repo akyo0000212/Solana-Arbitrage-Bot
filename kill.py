@@ -1,6 +1,8 @@
 #!/usr/bin/env python2
 
-import json, sys, httplib, urllib
+try: import json
+except ImportError: import simplejson as json
+import sys, httplib, urllib
 from datetime import datetime, timedelta
 from time import sleep
 
