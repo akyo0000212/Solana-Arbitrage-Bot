@@ -34,12 +34,16 @@ if len(deletion_ids) == 0:
 
 
 ## This part logs you in.
-headers = {"Content-type": "application/x-www-form-urlencoded"}
+headers = {
+    "Content-type": "application/x-www-form-urlencoded",
+    "User-Agent": "Shreddit"
+    }
 conn = httplib.HTTPSConnection('ssl.reddit.com')
 params = urllib.urlencode({
     'user': user,
     'passwd': passwd,
     'api_type': 'json'})
+
 conn.request("POST", "/api/login/%s" % user, params, headers)
 http = conn.getresponse()
 tmp = json.loads(http.read())['json']['data']
@@ -52,16 +56,16 @@ for dat in deletion_ids:
     subreddit = dat['subreddit']
     text = dat[u'body'][:20]
 
-    print '{id}: {time} {subreddit}: "{text}..."'.format(subreddit=subreddit, id=id, time=time, text=text)
+    #print '{id}: {time} {subreddit}: "{text}..."'.format(subreddit=subreddit, id=id, time=time, text=text)
     # And now for the deleting
     conn = httplib.HTTPConnection('www.reddit.com')
     params = urllib.urlencode({
         'id': id,
         'uh': modhash,
         'api_type': 'json'})
+    #headers.update({"Content-Length": len(params)})
     conn.request('POST', '/api/del', params, headers)
     http = conn.getresponse()
-    print http.read()  
-    #print '''Failed to delete "%s" (%s - %s - %s)''' % (text, id, time, subreddit)
-    break
+    if http.read() != '{}':
+        print '''Failed to delete "%s" (%s - %s - %s)''' % (text, id, time, subreddit)
     sleep(2)
