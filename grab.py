@@ -23,7 +23,6 @@ datum = []
 while True:
     after = reddit['data']['after']
     children = reddit['data']['children']
-    
 
     # This bit fills datum with the id (for removal) and the date (for saving recent posts)
     for child in children:

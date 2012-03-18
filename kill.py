@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import with_statement
 try: import json
 except ImportError: import simplejson as json
 import sys, httplib, urllib
@@ -16,24 +17,18 @@ user = data['user']
 passwd = data['passwd']
 
 ## Load our json which should be all the user's history
-f = open('data.json', 'r')
-data = json.load(f)
-f.close()
+with open('data.json', 'r') as f:
+    data = json.load(f)
 
 # Every thing before this time will be deleted
 before_time = datetime.now() - timedelta(days=days)
 
 ## Fill an array of IDs that are to be deleted
-deletion_ids = []
-for d in data:
-    date = datetime.fromtimestamp(d['created'])
-    if date < before_time:
-        deletion_ids.append(d)
+deletion_ids = [item for item in data if datetime.fromtimestamp(item['created']) < before_time]
 
 if len(deletion_ids) == 0:
     print "Couldn't find any posts to delete"
     exit(0)
-
 
 ## This part logs you in.
 headers = {
@@ -53,21 +48,21 @@ headers.update({'Cookie': 'reddit_session=%s' % tmp['cookie']})
 modhash = tmp['modhash']
 
 for dat in deletion_ids:
-    id = dat['id']
+    rid = dat['id']
     time = datetime.fromtimestamp(dat['created']).date()
     subreddit = dat['subreddit']
     text = dat[u'body'][:20]
 
-    #print '{id}: {time} {subreddit}: "{text}..."'.format(subreddit=subreddit, id=id, time=time, text=text)
+    #print '{rid}: {time} {subreddit}: "{text}..."'.format(subreddit=subreddit, rid=rid, time=time, text=text)
     # And now for the deleting
     conn = httplib.HTTPConnection('www.reddit.com')
     params = urllib.urlencode({
-        'id': id,
+        'id': rid,
         'uh': modhash,
         'api_type': 'json'})
     #headers.update({"Content-Length": len(params)})
     conn.request('POST', '/api/del', params, headers)
     http = conn.getresponse()
     if http.read() != '{}':
-        print '''Failed to delete "%s" (%s - %s - %s)''' % (text, id, time, subreddit)
+        print '''Failed to delete "%s" (%s - %s - %s)''' % (text, rid, time, subreddit)
     sleep(2)
