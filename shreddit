@@ -1,9 +1,9 @@
 #!/bin/sh
 
 echo "Running grab.py to get your history..."
-python2 grab.py $USER || exit 1
+python2 grab.py || exit 1
 
 echo "Running kill.py to annihilate your history..."
-python2 kill.py $DAYS || exit 2
+python2 kill.py || exit 2
 
 echo "Everything seemed to execute successfully."
