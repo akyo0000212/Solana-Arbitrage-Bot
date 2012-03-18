@@ -35,7 +35,7 @@ while True:
         child_data = child['data']
         if 'id' in child_data:
             datum.append({
-                'id': child_data[u'id'],
+                'id': child_data[u'name'],
                 'created': child_data['created'],
                 'body': child_data['body'],
                 'subreddit': child_data['subreddit']})
