@@ -34,7 +34,11 @@ while True:
     for child in children:
         child_data = child['data']
         if 'id' in child_data:
-            datum.append({'id': child_data[u'id'], 'date': child_data['created_utc']})
+            datum.append({
+                'id': child_data[u'id'],
+                'date': child_data['created'],
+                'text': child_data['body'],
+                'subreddit': child_data['subreddit']})
 
     if after == None:
         break
