@@ -1,9 +1,12 @@
 #!/bin/sh
 
+ROOT_DIR="/home/$USER/Shreddit"
+cd $ROOT_DIR
+
 echo "Running grab.py to get your history..."
-python2 grab.py || exit 1
+python2 $ROOT_DIR/grab.py || exit 1
 
 echo "Running kill.py to annihilate your history..."
-python2 kill.py || exit 2
+python2 $ROOT_DIR/kill.py || exit 2
 
 echo "Everything seemed to execute successfully."
