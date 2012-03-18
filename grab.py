@@ -1,14 +1,14 @@
 #!/usr/bin/env python2
 
+from __future__ import with_statement
 import sys
 try: import json
 except ImportError: import simplejson as json
 from urllib2 import urlopen, HTTPError
 from time import sleep
 
-f = open('user.json', 'r')
-user = json.load(f)['user']
-f.close()
+with open('user.json', 'r') as f:
+    user = json.load(f)['user']
 
 sub_section = 'comments'
 after = ''

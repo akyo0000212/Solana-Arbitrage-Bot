@@ -8,9 +8,8 @@ from datetime import datetime, timedelta
 from time import sleep
 
 ## Get the data we need to log into the API
-f = open('user.json', 'r')
-data = json.load(f)
-f.close()
+with open('user.json', 'r') as f:
+    data = json.load(f)
 
 days = data['days']
 user = data['user']
