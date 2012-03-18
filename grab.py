@@ -5,10 +5,13 @@ from json import loads, dumps
 from urllib2 import urlopen, HTTPError
 from time import sleep
 
-if len(sys.argv) != 2:
-    raise Exception("You must specifiy a user")
-
-user = sys.argv[1]
+user = None
+if len(sys.argv) == 2:
+    user = sys.argv[1]
+else:
+    f = open('user.json', 'r')
+    user = loads(f.read())['user']
+    f.close()
 
 sub_section = 'comments'
 after = ''

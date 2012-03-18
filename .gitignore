@@ -1,3 +1,4 @@
-*.json
+data.json
+user.json
 *.swp
 *~
