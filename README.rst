@@ -8,7 +8,7 @@ obscure the author (replaces with [deleted]) which may not be good enough for so
 
 Usage
 -----------
-- Add your Reddit details to user.json, should be self explanitory 
+- Add your Reddit details to user.json, should be self explanatory 
 - run `./schreddit`
 
 Caveats
