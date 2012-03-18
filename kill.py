@@ -46,14 +46,13 @@ tmp = json.loads(http.read())['json']['data']
 headers.update({'Cookie': 'reddit_session=%s' % tmp['cookie']})
 modhash = tmp['modhash']
 
-print '# Headers: %s' % headers
-
 for dat in deletion_ids:
-    print u'''{time} {subreddit}: {text}...'''.format(
-        subreddit = dat['subreddit'],
-        id = dat['id'],
-        time = datetime.fromtimestamp(dat['created']).date(),
-        text = dat[u'body'][:20])
+    id = dat['id']
+    time = datetime.fromtimestamp(dat['created']).date()
+    subreddit = dat['subreddit']
+    text = dat[u'body'][:20]
+
+    print '{time} {subreddit}: "{text}..."'.format(subreddit=subreddit, id=id, time=time, text=text)
     # And now for the deleting
     conn = httplib.HTTPConnection('www.reddit.com')
     params = urllib.urlencode({
@@ -62,6 +61,7 @@ for dat in deletion_ids:
         'api_type': 'json'})
     conn.request('POST', '/api/del', params, headers)
     http = conn.getresponse()
-    print http.getheaders(), http.read()
-    break
-    #sleep(2)
+    if http.read() != '{}':
+        print '''Failed to delete "%s" (%s - %s - %s)''' % (text, id, time, subreddit)
+    break # Still in-testing
+    sleep(2)
