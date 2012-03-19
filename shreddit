@@ -1,12 +1,16 @@
-#!/bin/sh
+#!/usr/bin/env python2
 
-ROOT_DIR="/home/$USER/Shreddit"
-cd $ROOT_DIR
+import reddit
+from datetime import datetime, timedelta
 
-echo "Running grab.py to get your history..."
-python2 $ROOT_DIR/grab.py || exit 1
+r = reddit.Reddit(user_agent="Shreddit-PRAW")
 
-echo "Running kill.py to annihilate your history..."
-python2 $ROOT_DIR/kill.py || exit 2
+r.login()
 
-echo "Everything seemed to execute successfully."
+before_time = datetime.now() - timedelta(days=7)
+
+for comment in r.user.get_comments(limit=None, sort='new'):
+    now_time = datetime.fromtimestamp(comment.created)
+    if now_time < before_time:
+        print 'Deleting: [%s]: "%s"' % (comment.subreddit, comment.body[:20])
+        comment.delete()
