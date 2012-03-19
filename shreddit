@@ -16,15 +16,24 @@ r = reddit.Reddit(user_agent="Shreddit-PRAW")
 # add user: <YourUsername> / pswd: <YourPassword> to the [reddit] config section
 r.login()
 
+if verbose:
+	print "Logged in as %s" % r.user
+
 before_time = datetime.now() - timedelta(days=days)
+
+if verbose:
+	print "Deleting messages before %s" % before_time
 
 whitelist = [y.strip().lower() for y in whitelist.split(',')]
 
+if verbose:
+	print "Keeping messages from subreddits %s" % ', '.join(whitelist)
+
 for comment in r.user.get_comments(limit=None, sort=sort):
-    if str(comment.subreddit).lower() in whitelist:
-        next
-    now_time = datetime.fromtimestamp(comment.created)
-    if now_time < before_time:
-        if verbose:
-            print 'Deleting: [%s]: "%s"' % (comment.subreddit, comment.body[:20])
-        comment.delete()
+	if str(comment.subreddit).lower() in whitelist:
+		next
+	now_time = datetime.fromtimestamp(comment.created)
+	if now_time < before_time:
+		if verbose:
+			print 'Deleting: [%s]: "%s"' % (comment.subreddit, comment.body[:20])
+		comment.delete()
