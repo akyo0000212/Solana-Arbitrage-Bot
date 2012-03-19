@@ -10,6 +10,7 @@ config.read('shreddit.cfg')
 days = config.getint('main', 'days')
 whitelist = config.get('main', 'whitelist')
 sort = config.get('main', 'sort')
+verbose = config.getboolean('main', 'verbose')
 
 r = reddit.Reddit(user_agent="Shreddit-PRAW")
 # add user: <YourUsername> / pswd: <YourPassword> to the [reddit] config section
@@ -24,5 +25,6 @@ for comment in r.user.get_comments(limit=None, sort=sort):
         next
     now_time = datetime.fromtimestamp(comment.created)
     if now_time < before_time:
-        print 'Deleting: [%s]: "%s"' % (comment.subreddit, comment.body[:20])
+        if verbose:
+            print 'Deleting: [%s]: "%s"' % (comment.subreddit, comment.body[:20])
         comment.delete()
