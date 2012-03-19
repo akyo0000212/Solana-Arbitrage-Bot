@@ -1,5 +1,1 @@
-*.backup
-data.json
-user.json
-*.swp
-*~
+reddit/
