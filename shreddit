@@ -1,15 +1,26 @@
 #!/usr/bin/env python2
 
 import reddit
+import ConfigParser
 from datetime import datetime, timedelta
 
-r = reddit.Reddit(user_agent="Shreddit-PRAW")
+config = ConfigParser.RawConfigParser()
+config.read('shreddit.cfg')
 
+days = config.getint('main', 'days')
+whitelist = config.get('main', 'whitelist')
+
+r = reddit.Reddit(user_agent="Shreddit-PRAW")
+# add user: <YourUsername> / pswd: <YourPassword> to the [reddit] config section
 r.login()
 
-before_time = datetime.now() - timedelta(days=7)
+before_time = datetime.now() - timedelta(days=days)
+
+whitelist = [y.strip().lower() for y in whitelist.split(',')]
 
 for comment in r.user.get_comments(limit=None, sort='new'):
+    if str(comment.subreddit).lower() in whitelist:
+        next
     now_time = datetime.fromtimestamp(comment.created)
     if now_time < before_time:
         print 'Deleting: [%s]: "%s"' % (comment.subreddit, comment.body[:20])
