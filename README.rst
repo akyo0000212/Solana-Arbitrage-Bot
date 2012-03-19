@@ -3,13 +3,11 @@ Shreddit
 
 Details
 -----------
-When one deletes their account on Reddit it does nothing with their comment history other than
-obscure the author (replaces with [deleted]) which may not be good enough for some.
+Uses the reddit_api over at https://github.com/mellort/reddit_api to do all the heavy lifting.
 
 Usage
 -----------
-- Add your Reddit details to user.json, should be self explanatory 
-- run `./schreddit`
+- Just run `./schreddit`
 
 Caveats
 -----------
