@@ -9,6 +9,7 @@ config.read('shreddit.cfg')
 
 days = config.getint('main', 'days')
 whitelist = config.get('main', 'whitelist')
+sort = config.get('main', 'sort')
 
 r = reddit.Reddit(user_agent="Shreddit-PRAW")
 # add user: <YourUsername> / pswd: <YourPassword> to the [reddit] config section
@@ -18,7 +19,7 @@ before_time = datetime.now() - timedelta(days=days)
 
 whitelist = [y.strip().lower() for y in whitelist.split(',')]
 
-for comment in r.user.get_comments(limit=None, sort='new'):
+for comment in r.user.get_comments(limit=None, sort=sort):
     if str(comment.subreddit).lower() in whitelist:
         next
     now_time = datetime.fromtimestamp(comment.created)
