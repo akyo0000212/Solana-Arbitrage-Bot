@@ -11,6 +11,8 @@ days = config.getint('main', 'days')
 whitelist = config.get('main', 'whitelist')
 sort = config.get('main', 'sort')
 verbose = config.getboolean('main', 'verbose')
+clear_vote = config.getboolean('main', 'clear_vote')
+item = config.get('main', 'item')
 
 r = reddit.Reddit(user_agent="Shreddit-PRAW")
 # add user: <YourUsername> / pswd: <YourPassword> to the [reddit] config section
@@ -29,11 +31,19 @@ whitelist = [y.strip().lower() for y in whitelist.split(',')]
 if verbose:
 	print "Keeping messages from subreddits %s" % ', '.join(whitelist)
 
-for comment in r.user.get_comments(limit=None, sort=sort):
-	if str(comment.subreddit).lower() in whitelist:
-		next
-	now_time = datetime.fromtimestamp(comment.created)
-	if now_time < before_time:
-		if verbose:
-			print 'Deleting: [%s]: "%s"' % (comment.subreddit, comment.body[:20])
-		comment.delete()
+things = []
+if item == "comments":
+    things = r.user.get_comments(limit=None, sort=sort)
+elif item == "submissions":
+    things = r.user.get_submissions(limit=None, sort=sort)
+
+for thing in things:
+    if str(thing.subreddit).lower() in whitelist:
+        continue
+    now_time = datetime.fromtimestamp(thing.created)
+    if now_time < before_time:
+        if verbose:
+            print 'Deleting: [%s]: "%s"' % (thing.subreddit, thing.body[:20])
+        if clear_vote:
+            thing.clear_vote()
+        thing.delete()
