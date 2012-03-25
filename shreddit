@@ -19,25 +19,34 @@ r = reddit.Reddit(user_agent="Shreddit-PRAW")
 r.login()
 
 if verbose:
-	print "Logged in as %s" % r.user
+    print "Logged in as %s" % r.user
 
 before_time = datetime.now() - timedelta(days=days)
 
 if verbose:
-	print "Deleting messages before %s" % before_time
+    print "Deleting messages before %s" % before_time
 
 whitelist = [y.strip().lower() for y in whitelist.split(',')]
 
 if verbose:
-	print "Keeping messages from subreddits %s" % ', '.join(whitelist)
+    print "Keeping messages from subreddits %s" % ', '.join(whitelist)
+
+delete_whitelist = ('comments', 'submitted')
+if item not in delete_whitelist:
+	raise Exception("Your deletion section is wrong")
 
 things = []
 if item == "comments":
     things = r.user.get_comments(limit=None, sort=sort)
-elif item == "submissions":
-    things = r.user.get_submissions(limit=None, sort=sort)
+elif item == "submitted":
+    things = r.user.get_submitted(limit=None, sort=sort)
 
 for thing in things:
+    if item == "submitted":
+        if verbose:
+            print thing
+        thing.delete()
+        continue
     if str(thing.subreddit).lower() in whitelist:
         continue
     now_time = datetime.fromtimestamp(thing.created)
