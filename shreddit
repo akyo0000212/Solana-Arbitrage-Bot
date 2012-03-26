@@ -19,40 +19,46 @@ r = reddit.Reddit(user_agent="Shreddit-PRAW")
 r.login()
 
 if verbose:
-    print "Logged in as %s" % r.user
+	print "Logged in as %s" % r.user
 
 before_time = datetime.now() - timedelta(days=days)
 
 if verbose:
-    print "Deleting messages before %s" % before_time
+	print "Deleting messages before %s" % before_time
 
 whitelist = [y.strip().lower() for y in whitelist.split(',')]
 
 if verbose:
-    print "Keeping messages from subreddits %s" % ', '.join(whitelist)
-
-delete_whitelist = ('comments', 'submitted')
-if item not in delete_whitelist:
-	raise Exception("Your deletion section is wrong")
+	print "Keeping messages from subreddits %s" % ', '.join(whitelist)
 
 things = []
 if item == "comments":
-    things = r.user.get_comments(limit=None, sort=sort)
+	things = r.user.get_comments(limit=None, sort=sort)
 elif item == "submitted":
-    things = r.user.get_submitted(limit=None, sort=sort)
-
+	things = r.user.get_submitted(limit=None, sort=sort)
+elif item == "overview":
+	things = r.user.get_overview(limit=None, sort=sort)
+else:
+	raise Exception("Your deletion section is wrong")
+	
 for thing in things:
-    if item == "submitted":
-        if verbose:
-            print thing
-        thing.delete()
-        continue
-    if str(thing.subreddit).lower() in whitelist:
-        continue
-    now_time = datetime.fromtimestamp(thing.created)
-    if now_time < before_time:
-        if verbose:
-            print 'Deleting: [%s]: "%s"' % (thing.subreddit, thing.body[:20])
-        if clear_vote:
-            thing.clear_vote()
-        thing.delete()
+	thing_time = datetime.fromtimestamp(thing.created)
+
+	#print "%s, %s, %s" % (thing_time, before_time, thing_time < before_time)
+
+	if thing_time > before_time:
+		continue
+
+	if str(thing.subreddit).lower() in whitelist:
+		continue
+
+	if item == "submitted" or item == "overview":
+		if verbose:
+			print "Deleting: %s" % thing
+		thing.delete()
+	elif item == "comments":
+		if verbose:
+			print 'Deleting: [%s]: "%s"' % (thing.subreddit, thing.body[:20])
+		if clear_vote:
+			thing.clear_vote()
+		thing.delete()
