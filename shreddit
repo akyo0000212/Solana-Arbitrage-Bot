@@ -2,6 +2,7 @@
 
 import reddit
 import ConfigParser
+import re
 from datetime import datetime, timedelta
 
 config = ConfigParser.RawConfigParser()
@@ -9,6 +10,7 @@ config.read('shreddit.cfg')
 
 days = config.getint('main', 'days')
 whitelist = config.get('main', 'whitelist')
+whitelist_ids = config.get('main', 'whitelist_ids')
 sort = config.get('main', 'sort')
 verbose = config.getboolean('main', 'verbose')
 clear_vote = config.getboolean('main', 'clear_vote')
@@ -27,6 +29,7 @@ if verbose:
 	print "Deleting messages before %s" % before_time
 
 whitelist = [y.strip().lower() for y in whitelist.split(',')]
+whitelist_ids = [y.strip().lower() for y in whitelist_ids.split(',')]
 
 if verbose:
 	print "Keeping messages from subreddits %s" % ', '.join(whitelist)
@@ -45,6 +48,9 @@ for thing in things:
 	thing_time = datetime.fromtimestamp(thing.created)
 
 	#print "%s, %s, %s" % (thing_time, before_time, thing_time < before_time)
+
+	if thing.id in whitelist_ids:
+		continue
 
 	if thing_time > before_time:
 		continue
