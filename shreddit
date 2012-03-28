@@ -2,7 +2,6 @@
 
 import reddit
 import ConfigParser
-import re
 from datetime import datetime, timedelta
 
 config = ConfigParser.RawConfigParser()
