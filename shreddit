@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 config = ConfigParser.RawConfigParser()
 config.read('shreddit.cfg')
 
-days = config.getint('main', 'days')
+hours = config.getint('main', 'hours')
 whitelist = config.get('main', 'whitelist')
 whitelist_ids = config.get('main', 'whitelist_ids')
 sort = config.get('main', 'sort')
@@ -22,7 +22,7 @@ r.login()
 if verbose:
 	print "Logged in as %s" % r.user
 
-before_time = datetime.now() - timedelta(days=days)
+before_time = datetime.now() - timedelta(hours=hours)
 
 if verbose:
 	print "Deleting messages before %s" % before_time

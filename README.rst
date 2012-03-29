@@ -8,6 +8,7 @@ Uses the reddit_api over at https://github.com/mellort/reddit_api to do all the 
 Usage
 -----------
 - Just run `./schreddit`
+- You may want to check out the reddit_api, build it using `python setup.py build` and then copy the /reddit directory to this directory. The reason I don't provide it is that the reddit_api changes frequently and I don't want to include a static old version here. I also don't want to have a git repo in a git repo.
 
 Caveats
 -----------
