@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 
-import reddit
+import praw
 import ConfigParser
 from datetime import datetime, timedelta
 
@@ -15,9 +15,15 @@ verbose = config.getboolean('main', 'verbose')
 clear_vote = config.getboolean('main', 'clear_vote')
 item = config.get('main', 'item')
 
-r = reddit.Reddit(user_agent="Shreddit-PRAW")
-# add user: <YourUsername> / pswd: <YourPassword> to the [reddit] config section
-r.login()
+_user = config.get('main', 'username')
+_pass = config.get('main', 'password')
+
+r = praw.Reddit(user_agent="Shreddit-PRAW 2.0")
+
+if _user and _pass:
+	r.login(_user, _pass)
+else:
+	r.login()
 
 if verbose:
 	print "Logged in as %s" % r.user

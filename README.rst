@@ -3,16 +3,16 @@ Shreddit
 
 Details
 -----------
-Uses the reddit_api over at https://github.com/mellort/reddit_api to do all the heavy lifting.
+Uses the praw over at https://github.com/praw-dev/praw to do all the heavy lifting.
 
 Usage
 -----------
 - Just run `./schreddit`
-- You may want to check out the reddit_api, build it using `python setup.py build` and then copy the /reddit directory to this directory. The reason I don't provide it is that the reddit_api changes frequently and I don't want to include a static old version here. I also don't want to have a git repo in a git repo.
+- You will need the `praw` Reddit Python library installed somewhere. I advise taking a read of https://github.com/praw-dev/praw#installation
 
 Tit-bits
 -----------
-- If you fill in your user/passwd in your reddit_api then you won't be asked for login details when you run the program! Otherwise you'll be prompted every time.
+- If you fill in your user/passwd in your reddit.cfg then you won't be asked for login details when you run the program! Otherwise you'll be prompted every time.
 
 Cron examples
 -----------
