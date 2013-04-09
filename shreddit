@@ -2,10 +2,18 @@
 
 import praw
 import ConfigParser
+import argparse
 from datetime import datetime, timedelta
 
+parser = argparse.ArgumentParser()
+parser.add_argument('-c', '--config', help="config file to use instead of shreddit.cfg")
+args = parser.parse_args()
+
 config = ConfigParser.RawConfigParser()
-config.read('shreddit.cfg')
+if args.config:
+    config.read(args.config)
+else:
+    config.read('shreddit.cfg')
 
 hours = config.getint('main', 'hours')
 whitelist = config.get('main', 'whitelist')
