@@ -80,4 +80,5 @@ for thing in things:
 			print 'Deleting: [%s]: "%s"' % (thing.subreddit, thing.body[:20])
 		if clear_vote:
 			thing.clear_vote()
+		thing.edit('Shredded')
 		thing.delete()
