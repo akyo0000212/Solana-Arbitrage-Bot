@@ -34,3 +34,8 @@ Caveats
 - Would make life easier if Reddit just did a "DELETE * FROM abc_def WHERE user_id = 1337"
 
 - You require the reddit python library somewhere in your PYTHONPATH
+
+Donations
+----------
+If you enjoy the added privacy from this script consider donating a tiny wee bit to myself, I will love you forever if you do!
+17x7Zp3SKGMJu7S3MGa5ktKVDj4ZVAqB14
