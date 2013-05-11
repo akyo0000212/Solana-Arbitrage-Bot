@@ -1,14 +1,16 @@
 #!/usr/bin/env python2
 
 import praw
+from praw.objects import Comment, Submission
 import ConfigParser
 import argparse
 from datetime import datetime, timedelta
+from re import sub
 
 try:
 	from loremipsum import get_sentence
 except:
-	get_sentence = '''I have been Shreddited for privacy!'''
+	get_sentence = lambda: '''I have been Shreddited for privacy!\nhttps://github.com/x89/Shreddit/'''
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-c', '--config', help="config file to use instead of shreddit.cfg")
@@ -27,12 +29,13 @@ sort = config.get('main', 'sort')
 verbose = config.getboolean('main', 'verbose')
 clear_vote = config.getboolean('main', 'clear_vote')
 trial_run = config.getboolean('main', 'trial_run')
+edit_only = config.getboolean('main', 'edit_only')
 item = config.get('main', 'item')
 
 _user = config.get('main', 'username')
 _pass = config.get('main', 'password')
 
-r = praw.Reddit(user_agent="Shreddit-PRAW 2.0")
+r = praw.Reddit(user_agent="Shreddit-PRAW 2.1")
 
 if _user and _pass:
 	r.login(_user, _pass)
@@ -40,18 +43,16 @@ else:
 	r.login()
 
 if verbose:
-	print "Logged in as %s" % r.user
-
-before_time = datetime.now() - timedelta(hours=hours)
+	print "Logged in as {0}".format(r.user)
 
 if verbose:
-	print "Deleting messages before %s" % before_time
+	print "Deleting messages before {0}.".format(datetime.now() - timedelta(hours=hours))
 
 whitelist = [y.strip().lower() for y in whitelist.split(',')]
 whitelist_ids = [y.strip().lower() for y in whitelist_ids.split(',')]
 
 if verbose:
-	print "Keeping messages from subreddits %s" % ', '.join(whitelist)
+	print "Keeping messages from subreddits {0}".format(', '.join(whitelist))
 
 things = []
 if item == "comments":
@@ -64,32 +65,31 @@ else:
 	raise Exception("Your deletion section is wrong")
 	
 for thing in things:
-	thing_time = datetime.fromtimestamp(thing.created)
-
-	#print "%s, %s, %s" % (thing_time, before_time, thing_time < before_time)
+	thing_time = datetime.fromtimestamp(thing.created_utc)
+	before_time = datetime.utcnow() - timedelta(hours=hours)
 
 	if thing.id in whitelist_ids:
 		continue
 
 	if thing_time > before_time:
+		print '#', thing_time, '----', before_time
 		continue
-
+	
 	if str(thing.subreddit).lower() in whitelist:
 		continue
 
-	if item == "submitted" or item == "overview":
-		if verbose:
-			print "Deleting: %s" % thing
-		thing.delete()
-	elif item == "comments":
-		if verbose:
-			print 'Deleting: [%s]: "%s"' % (thing.subreddit, thing.body[:20])
+	if not trial_run:
 		if clear_vote:
 			thing.clear_vote()
-		if trial_run:
-			thing.edit(get_sentence)
+		if isinstance(thing, Submission):
 			if verbose:
-				print "Edited comment with {0}".format(get_sentence)
+				print u'Deleting submission: #{0} {1}'.format(thing.id, thing.url)
+		elif isinstance(thing, Comment):
+			replacement_text = get_sentence()
+			if verbose:
+				print 'Editing and deleting /r/{3}/ #{0} with:\n\t"{1}" to\n\t"{2}"'.format(
+					thing.id, sub(r'[\t\r\n]', ' ', thing.body.encode('ascii', 'ignore')[:78]),
+					replacement_text[:78], thing.subreddit)
+				thing.edit(replacement_text)
+		if not edit_only:
 			thing.delete()
-			if verbose:
-				print "Comment deleted."
