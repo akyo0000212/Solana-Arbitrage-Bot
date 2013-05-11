@@ -38,5 +38,7 @@ Caveats
 Donations
 ----------
 If you enjoy the added privacy from this script consider donating a tiny wee bit to myself, I will love you forever if you do!
+
 My Bitcoin address is: 17x7Zp3SKGMJu7S3MGa5ktKVDj4ZVAqB14
+
 My PayPal email address is "napalm10" on the old Gmail!
