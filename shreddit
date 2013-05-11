@@ -5,6 +5,11 @@ import ConfigParser
 import argparse
 from datetime import datetime, timedelta
 
+try:
+	from loremipsum import get_sentence
+except:
+	get_sentence = '''I have been Shreddited for privacy!'''
+
 parser = argparse.ArgumentParser()
 parser.add_argument('-c', '--config', help="config file to use instead of shreddit.cfg")
 args = parser.parse_args()
@@ -21,6 +26,7 @@ whitelist_ids = config.get('main', 'whitelist_ids')
 sort = config.get('main', 'sort')
 verbose = config.getboolean('main', 'verbose')
 clear_vote = config.getboolean('main', 'clear_vote')
+trial_run = config.getboolean('main', 'trial_run')
 item = config.get('main', 'item')
 
 _user = config.get('main', 'username')
@@ -80,5 +86,10 @@ for thing in things:
 			print 'Deleting: [%s]: "%s"' % (thing.subreddit, thing.body[:20])
 		if clear_vote:
 			thing.clear_vote()
-		thing.edit('Shredded')
-		thing.delete()
+		if trial_run:
+			thing.edit(get_sentence)
+			if verbose:
+				print "Edited comment with {0}".format(get_sentence)
+			thing.delete()
+			if verbose:
+				print "Comment deleted."
