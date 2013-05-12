@@ -9,6 +9,7 @@ Usage
 -----------
 - Just run `./schreddit`
 - You will need the `praw` Reddit Python library installed somewhere. I advise taking a read of https://github.com/praw-dev/praw#installation
+- If you want custom edits (via lorem ipsum) then you must have the module installed. You can install it with pip using the command `sudo pip2 install loremipsum` on most operating systems. It may be called `pip` and not `pip2` - it depends on the versions of Python you have installed.
 
 Tit-bits
 -----------
