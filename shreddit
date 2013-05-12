@@ -72,7 +72,6 @@ for thing in things:
 		continue
 
 	if thing_time > before_time:
-		print '#', thing_time, '----', before_time
 		continue
 	
 	if str(thing.subreddit).lower() in whitelist:
