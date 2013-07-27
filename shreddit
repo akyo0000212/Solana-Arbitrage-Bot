@@ -66,15 +66,20 @@ else:
 	
 for thing in things:
 	thing_time = datetime.fromtimestamp(thing.created_utc)
-	before_time = datetime.utcnow() - timedelta(hours=hours)
-
-	if thing.id in whitelist_ids:
-		continue
-
-	if thing_time > before_time:
+	# Delete things after after_time
+	after_time = datetime.utcnow() - timedelta(hours=hours)
+	if thing_time > after_time:
 		continue
 	
-	if str(thing.subreddit).lower() in whitelist:
+	# For edit_only we're assuming that the hours aren't altered.
+	# This saves time when deleting (you don't edit already edited posts).
+	if edit_only:
+		end_time = after_time - timedelta(hours=hours)
+		if thing_time < end_time:
+			continue
+
+	if str(thing.subreddit).lower() in whitelist or \
+	   thing.id in whitelist_ids:
 		continue
 
 	if not trial_run:
@@ -86,9 +91,16 @@ for thing in things:
 		elif isinstance(thing, Comment):
 			replacement_text = get_sentence()
 			if verbose:
-				print 'Editing and deleting /r/{3}/ #{0} with:\n\t"{1}" to\n\t"{2}"'.format(
-					thing.id, sub(r'[\t\r\n]', ' ', thing.body.encode('ascii', 'ignore')[:78]),
-					replacement_text[:78], thing.subreddit)
-				thing.edit(replacement_text)
+				msg = '/r/{3}/ #{0} with:\n\t"{1}" to\n\t"{2}"'.format(
+					thing.id,
+					sub(r'[\t\r\n]', ' ', thing.body.encode('ascii', 'ignore')[:78]),
+					replacement_text[:78],
+					thing.subreddit
+				)
+				if edit_only:
+					print 'Editing ' + msg
+				else:
+					print 'Editing and deleting ' + msg
+			thing.edit(replacement_text)
 		if not edit_only:
 			thing.delete()
