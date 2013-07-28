@@ -1,12 +1,10 @@
 #!/usr/bin/env python2
 
-import praw
+import praw, argparse, ConfigParser
 from praw.objects import Comment, Submission
-import ConfigParser
-import argparse
 from datetime import datetime, timedelta
 from re import sub
-
+from time import sleep
 try:
 	from loremipsum import get_sentence
 except:
@@ -38,7 +36,13 @@ _pass = config.get('main', 'password')
 r = praw.Reddit(user_agent="Shreddit-PRAW 2.1")
 
 if _user and _pass:
-	r.login(_user, _pass)
+	try:
+		r.login(_user, _pass)
+	except HTTPError:
+		# Try again (often get 500 errors)
+		sleep(10)
+		r.login(_user, _pass)
+
 else:
 	r.login()
 
