@@ -10,7 +10,7 @@ Uses PRAW over at https://github.com/praw-dev/praw to do all the heavy lifting.
 
 Usage
 -----------
-- Just run `./schreddit`
+- Just run `./shreddit`
 - You will need the `praw` Reddit Python library installed somewhere. I advise taking a read of https://github.com/praw-dev/praw#installation
 - If you want custom edits (via lorem ipsum) then you must have the module installed. You can install it with pip using the command `pip2 install loremipsum` on most operating systems. It may be called `pip` and not `pip2` - it depends on the versions of Python you have installed.
 
