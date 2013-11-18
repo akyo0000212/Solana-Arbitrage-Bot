@@ -38,7 +38,7 @@ r = praw.Reddit(user_agent="Shreddit-PRAW 2.1")
 if _user and _pass:
 	try:
 		r.login(_user, _pass)
-	except HTTPError:
+	except:
 		# Try again (often get 500 errors)
 		sleep(10)
 		r.login(_user, _pass)
