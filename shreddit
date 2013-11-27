@@ -39,7 +39,7 @@ if _user and _pass:
 	try:
 		r.login(_user, _pass)
 	except:
-		# Try again (often get 500 errors)
+		# Try again (often get HTTP when Reddit is down for a second errors)
 		sleep(10)
 		r.login(_user, _pass)
 
