@@ -11,7 +11,7 @@ from time import sleep
 
 try:
     from loremipsum import get_sentence
-except:
+except ImportError:
     def get_sentence():
         return '''I have been Shreddited for privacy!\n\n\
                 https://github.com/x89/Shreddit/'''
@@ -122,10 +122,10 @@ for thing in things:
                     replacement_text[:78],
                     thing.subreddit
                 )
-            if edit_only:
-                print('Editing {msg}'.format(msg=msg))
-            else:
-                print('Editing and deleting {msg}'.format(msg=msg))
+                if edit_only:
+                    print('Editing {msg}'.format(msg=msg))
+                else:
+                    print('Editing and deleting {msg}'.format(msg=msg))
             thing.edit(replacement_text)
         if not edit_only:
             thing.delete()
