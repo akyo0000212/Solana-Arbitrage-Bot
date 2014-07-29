@@ -118,7 +118,7 @@ for thing in things:
             if verbose:
                 msg = '/r/{3}/ #{0} with:\n\t"{1}" to\n\t"{2}"'.format(
                     thing.id,
-                    sub(r'\n\r\t', ' ', thing.body[:78]),
+                    sub(r'\n\r\t', ' ', thing.body[:78].encode('utf-8')),
                     replacement_text[:78],
                     thing.subreddit
                 )
