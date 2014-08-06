@@ -8,11 +8,14 @@ Note: When it became known that post edits were *not* saved but post deletions *
 Basically it lets you maintain your normal reddit account while having your history scrubbed after a certain amount of time.
 Uses PRAW over at https://github.com/praw-dev/praw to do all the heavy lifting.
 
-Usage
+Usage & Installation
 -----------
-- Just run `./shreddit`
-- You will need the `praw` Reddit Python library installed somewhere. I advise taking a read of https://github.com/praw-dev/praw#installation
-- If you want custom edits (via lorem ipsum) then you must have the module installed. You can install it with pip using the command `pip2 install loremipsum` on most operating systems. It may be called `pip` and not `pip2` - it depends on the versions of Python you have installed.
+I highly advise setting up a virtual environment for Python locally (via the `virtualenv` command) and from there you'll be able to run `source bin/activate` and then `pip install -r requirements.txt`
+and that will install everything that's required to run the script.
+
+After that you'll simply want to run `python shreddit.py -c config_file.cfg` or set up a cron job to do it periodically.
+
+Alternatively you may install the requirements (see requirements.txt) from your distro if they are there.
 
 Tit-bits
 -----------
@@ -23,13 +26,13 @@ Cron examples
 - Run crontab -e to edit your cron file. If you have access to something like vixie-cron then each user can have their own personal cron job!
 
 - Run every hour on the hour
-	`0 * * * * cd /home/$USER/Shreddit/; ./shreddit`
+	`0 * * * * cd /home/$USER/Shreddit/ && source bin/activate && ./shreddit.py`
 
 - Run at 3am every morning
-	`0 3 * * * cd /home/$USER/Shreddit/; ./shreddit`
+	`0 3 * * * cd /home/$USER/Shreddit/ && source bin/activate && ./shreddit.py`
 
 - Run once a month on the 1st of the month
-	`0 0 1 * * cd /home/$USER/Shreddit/; ./shreddit`
+	`0 0 1 * * cd /home/$USER/Shreddit/ && source bin/activate && ./shreddit.py`
 
 Caveats
 -----------
