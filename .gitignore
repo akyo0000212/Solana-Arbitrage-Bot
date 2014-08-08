@@ -1,5 +1,6 @@
 *.cfg
 *.pyc
+.idea/
 bin/
 include/
 lib/

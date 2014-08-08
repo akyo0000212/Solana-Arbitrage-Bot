@@ -1,20 +1,34 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+
+import os
+import argparse
+
+from re import sub
+from random import shuffle, randint
+from simpleconfigparser import simpleconfigparser
+from datetime import datetime, timedelta
 
 import praw
-from praw.errors import *
-import argparse
-from simpleconfigparser import simpleconfigparser
+from praw.errors import InvalidUser, InvalidUserPass, RateLimitExceeded
 from praw.objects import Comment, Submission
-from datetime import datetime, timedelta
-from re import sub
-from time import sleep
 
 try:
-    from loremipsum import get_sentence
+    from loremipsum import get_sentence  # This only works on Python 2
 except ImportError:
-    def get_sentence():
-        return '''I have been Shreddited for privacy!\n\n\
-                https://github.com/x89/Shreddit/'''
+    if os.name == 'posix':
+        try:
+            # Try to generate a random string of words
+            fh = open('/usr/share/dict/words')
+            words = fh.read().splitlines()
+            fh.close()
+            shuffle(words)
+
+            def get_sentence():
+                return ' '.join(words[:randint(50, 150)])
+        except FileNotFoundError:
+            def get_sentence():
+                return '''I have been Shreddited for privacy!\n\n\
+                        https://github.com/x89/Shreddit/'''
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -52,12 +66,12 @@ def login(user=None, password=None):
             r.login(_user, _pass)
         else:
             r.login()  # Let the user supply details
+    except InvalidUser as e:
+        raise InvalidUser("User does not exist.", e)
     except InvalidUserPass as e:
-        raise InvalidUserPass(e)
-    except RateLimitExceeded:
-        raise RateLimitExceeded()
-    except NonExistentUser:
-        raise NonExistentUser("User does not exist")
+        raise InvalidUserPass("Specified an incorrect password.", e)
+    except RateLimitExceeded as e:
+        raise RateLimitExceeded("You're doing that too much.", e)
 
 login(user=_user, password=_pass)
 
