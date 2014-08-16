@@ -1,7 +1,9 @@
 *.cfg
 *.pyc
-.idea/
-bin/
-include/
-lib/
+.idea
+bin
+include
+lib
+env
+shreddit.conf
 __pycache__/

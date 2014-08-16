@@ -2,6 +2,7 @@
 
 # Login details for Reddit. Fill out if you don't wish
 # to be prompted for a login every time you run Shreddit.
+### NOTE: This may be deprecated as you can specify in praw.ini instead
 username = 
 password =
 
@@ -42,3 +43,9 @@ trial_run = True
 # Don't delete but *do* edit, could prove... interesting to see a comment
 # with 5000 upvotes and it's just a lorem ipsum!
 edit_only = True
+
+# Ignore distinguished comments.
+ignore_distinguished = True
+
+# ignore gilded (gold) comments
+whitelist_gilded = True

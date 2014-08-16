@@ -53,7 +53,8 @@ clear_vote = config.getboolean('main', 'clear_vote')
 trial_run = config.getboolean('main', 'trial_run')
 edit_only = config.getboolean('main', 'edit_only')
 item = config.get('main', 'item')
-
+whitelist_distinguished = config.getboolean('main', 'whitelist_distinguished')
+whitelist_gilded = config.getboolean('main', 'whitelist_gilded')
 _user = config.get('main', 'username')
 _pass = config.get('main', 'password')
 
@@ -73,7 +74,8 @@ def login(user=None, password=None):
     except RateLimitExceeded as e:
         raise RateLimitExceeded("You're doing that too much.", e)
 
-login(user=_user, password=_pass)
+if not r.is_logged_in():
+    login(user=_user, password=_pass)
 
 if verbose:
     print("Logged in as {user}".format(user=r.user))
@@ -118,28 +120,35 @@ for thing in things:
        thing.id in whitelist_ids:
         continue
 
-    if not trial_run:
-        if clear_vote:
-            thing.clear_vote()
-        if isinstance(thing, Submission):
-            if verbose:
-                print(u'Deleting submission: #{id} {url}'.format(
-                    id=thing.id,
-                    url=thing.url)
-                )
-        elif isinstance(thing, Comment):
-            replacement_text = get_sentence()
-            if verbose:
-                msg = '/r/{3}/ #{0} with:\n\t"{1}" to\n\t"{2}"'.format(
-                    thing.id,
-                    sub(b'\n\r\t', ' ', thing.body[:78].encode('utf-8')),
-                    replacement_text[:78],
-                    thing.subreddit
-                )
-                if edit_only:
-                    print('Editing {msg}'.format(msg=msg))
-                else:
-                    print('Editing and deleting {msg}'.format(msg=msg))
-            thing.edit(replacement_text)
-        if not edit_only:
-            thing.delete()
+    if trial_run:
+        # Don't actually perform any actions
+        next
+    if whitelist_distinguished and item.distinguished:
+        next
+    if whitelist_gilded and thing.gilded:
+        next
+
+    if clear_vote:
+        thing.clear_vote()
+    if isinstance(thing, Submission):
+        if verbose:
+            print(u'Deleting submission: #{id} {url}'.format(
+                id=thing.id,
+                url=thing.url)
+            )
+    elif isinstance(thing, Comment):
+        replacement_text = get_sentence()
+        if verbose:
+            msg = '/r/{3}/ #{0} with:\n\t"{1}" to\n\t"{2}"'.format(
+                thing.id,
+                sub(b'\n\r\t', ' ', thing.body[:78].encode('utf-8')),
+                replacement_text[:78],
+                thing.subreddit
+            )
+            if edit_only:
+                print('Editing {msg}'.format(msg=msg))
+            else:
+                print('Editing and deleting {msg}'.format(msg=msg))
+        thing.edit(replacement_text)
+    if not edit_only:
+        thing.delete()
