@@ -6,4 +6,5 @@ include
 lib
 env
 shreddit.conf
+praw.ini
 __pycache__/
