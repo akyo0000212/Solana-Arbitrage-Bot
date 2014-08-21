@@ -1,4 +1,5 @@
 *.cfg
 *.pyc
 shreddit.conf
+praw.ini
 __pycache__/

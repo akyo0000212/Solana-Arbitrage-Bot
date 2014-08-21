@@ -45,7 +45,7 @@ trial_run = True
 edit_only = True
 
 # Ignore distinguished comments.
-ignore_distinguished = True
+whitelist_distinguished = True
 
 # ignore gilded (gold) comments
 whitelist_gilded = True
