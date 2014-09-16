@@ -58,7 +58,7 @@ whitelist_gilded = config.getboolean('main', 'whitelist_gilded')
 _user = config.get('main', 'username')
 _pass = config.get('main', 'password')
 
-r = praw.Reddit(user_agent="Shreddit-PRAW 3")
+r = praw.Reddit(user_agent="shreddit/3.1")
 
 
 def login(user=None, password=None):
