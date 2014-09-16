@@ -25,7 +25,7 @@ except ImportError:
 
             def get_sentence():
                 return ' '.join(words[:randint(50, 150)])
-        except FileNotFoundError:
+        except IOError:
             def get_sentence():
                 return '''I have been Shreddited for privacy!\n\n\
                         https://github.com/x89/Shreddit/'''
