@@ -123,7 +123,7 @@ for thing in things:
     if trial_run:
         # Don't actually perform any actions
         next
-    if whitelist_distinguished and item.distinguished:
+    if whitelist_distinguished and thing.distinguished:
         next
     if whitelist_gilded and thing.gilded:
         next
