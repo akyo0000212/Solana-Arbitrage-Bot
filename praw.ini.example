@@ -1,3 +1,4 @@
 [DEFAULT]
 user = 
 pswd = 
+log_requests = 0
