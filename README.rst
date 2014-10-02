@@ -18,6 +18,8 @@ The way I personally install Shreddit is via a handy tool called `virtualenv` wh
 5. Copy `shreddit.cfg.example` to something else and edit it to your liking.
 6. Run `python shreddit.py -c YOUR_CONFIG_FILE.cfg`.
 
+Alternatively try to run `./install.sh` and it will attempt to do it all for you.
+
 Notes:
 
 - The script *does* work with Python versions 2 and 3 but people often get in a mess with pip versions, python versions and virtulenv versions. Make sure that your Python/pip/virtualenv are all the same version. If you ran the above code it *should* work as stated.
