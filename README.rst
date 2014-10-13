@@ -9,7 +9,7 @@ Basically it lets you maintain your normal reddit account while having your hist
 
 Installation
 -----------
-The way I personally install Shreddit is via a handy tool called `virtualenv` which may come with your packagae manager or may be a part of your Python package in your distro (have a search if you can't find it). Both Python 2 and 4 are supported.
+The way I personally install Shreddit is via a handy tool called `virtualenv` which may come with your packagae manager or may be a part of your Python package in your distro (have a search if you can't find it). Both Python 2 and 3 are supported.
 
 1. Clone the repository
 2. Enter the repository's directory and run `virtualenv .` (this creates a virtual environment)
