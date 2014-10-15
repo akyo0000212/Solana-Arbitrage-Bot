@@ -34,7 +34,7 @@ item = overview
 whitelist = AskScience, TheCulture, redditdev, programming, charity
 
 # If you want any specific posts to be whitelisted stick 'em in here
-whitelist_ids = abcdef 
+whitelist_ids =  
 
 # If you set this then no editing or deleting will be done
 # but the output from the program will be shown as an example
@@ -42,10 +42,17 @@ trial_run = True
 
 # Don't delete but *do* edit, could prove... interesting to see a comment
 # with 5000 upvotes and it's just a lorem ipsum!
-edit_only = True
+edit_only = False
 
 # Ignore distinguished comments.
 whitelist_distinguished = True
 
-# ignore gilded (gold) comments
+# Ignore gilded (gold) comments
 whitelist_gilded = True
+
+# Delete everything older that this date, **This ignores whitelists**.
+# Can be used as a second deletion, as in "delete items older than 24 hours
+# except on whitelisted subreddits but after 3 months delete everything.
+nuke_hours = 0
+
+# vim: syntax=config

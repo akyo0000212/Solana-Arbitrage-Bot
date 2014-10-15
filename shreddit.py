@@ -55,10 +55,11 @@ edit_only = config.getboolean('main', 'edit_only')
 item = config.get('main', 'item')
 whitelist_distinguished = config.getboolean('main', 'whitelist_distinguished')
 whitelist_gilded = config.getboolean('main', 'whitelist_gilded')
+nuke_hours = config.getint('main', 'nuke_hours')
 _user = config.get('main', 'username')
 _pass = config.get('main', 'password')
 
-r = praw.Reddit(user_agent="shreddit/3.1")
+r = praw.Reddit(user_agent="shreddit/3.2")
 
 
 def login(user=None, password=None):
@@ -105,9 +106,11 @@ else:
 
 for thing in things:
     thing_time = datetime.fromtimestamp(thing.created_utc)
-    # Delete things after after_time
+    # Exclude items from being deleted unless past X hours. 
     after_time = datetime.utcnow() - timedelta(hours=hours)
     if thing_time > after_time:
+        if thing_time + timedelta(hours=nuke_hours) < datetime.utcnow():
+            pass
         continue
     # For edit_only we're assuming that the hours aren't altered.
     # This saves time when deleting (you don't edit already edited posts).
@@ -120,13 +123,15 @@ for thing in things:
        thing.id in whitelist_ids:
         continue
 
-    if trial_run:
-        # Don't actually perform any actions
-        next
+    if trial_run:  # Don't do anything, trial mode!
+        if verbose:
+            print("Would have deleted {thing}: '{content}'".format(
+                thing=thing.id, content=thing))
+        continue
     if whitelist_distinguished and thing.distinguished:
-        next
+        continue
     if whitelist_gilded and thing.gilded:
-        next
+        continue
 
     if clear_vote:
         thing.clear_vote()
