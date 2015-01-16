@@ -3,13 +3,13 @@ Shreddit
 
 Details
 -----------
-Shreddit is a Python command line program which will take a user's post history on the website Reddit (http://reddit.com) and after having the user edit a config file will systematically go through the user's history deleting one post/submission at a time utnil only those whitelisted remain.
+Shreddit is a Python command line program which will take a user's post history on the website Reddit (http://reddit.com) and after having the user edit a config file will systematically go through the user's history deleting one post/submission at a time until only those whitelisted remain.
 Note: When it became known that post edits were *not* saved but post deletions *were* saved code was added to edit your post prior to deletion. In fact you can actually turn off deletion all together and just have lorem ipsum (or a message about Shreddit) but this will increase how long it takes the script to run as it will be going over all of your messages every run!
 Basically it lets you maintain your normal reddit account while having your history scrubbed after a certain amount of time.
 
 Installation
 -----------
-The way I personally install Shreddit is via a handy tool called `virtualenv` which may come with your packagae manager or may be a part of your Python package in your distro (have a search if you can't find it). Both Python 2 and 3 are supported.
+The way I personally install Shreddit is via a handy tool called `virtualenv` which may come with your package manager or may be a part of your Python package in your distro (have a search if you can't find it). Both Python 2 and 3 are supported.
 
 1. Clone the repository
 2. Enter the repository's directory and run `virtualenv .` (this creates a virtual environment)
@@ -42,6 +42,6 @@ Cron examples
 
 Caveats
 -----------
-- Only your previous 1,000 comments are accessable on Reddit. So good luck deleting the others. There may be ways to hack around this via iterating using sorting by top/best/controversial/new but for now I am unsure. I believe it best to set the script settings and run it as a cron job and then it won't be a problem unless you post *a lot*. I do, however, think that it may be a caching issue and perhaps after a certain time period your post history would, once again, become available as a block of 1,000. So you needn't despair yet!
+- Only your previous 1,000 comments are accessible on Reddit. So good luck deleting the others. There may be ways to hack around this via iterating using sorting by top/best/controversial/new but for now I am unsure. I believe it best to set the script settings and run it as a cron job and then it won't be a problem unless you post *a lot*. I do, however, think that it may be a caching issue and perhaps after a certain time period your post history would, once again, become available as a block of 1,000. So you needn't despair yet!
 
-- We are relying on Reddit admin words that they do not store edits, deleted posts are still stored in the database they are merely inaccessable to the public.
+- We are relying on Reddit admin words that they do not store edits, deleted posts are still stored in the database they are merely inaccessible to the public.
