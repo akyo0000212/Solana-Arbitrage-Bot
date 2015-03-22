@@ -15,20 +15,19 @@ from praw.objects import Comment, Submission
 try:
     from loremipsum import get_sentence  # This only works on Python 2
 except ImportError:
-    if os.name == 'posix':
-        try:
-            # Try to generate a random string of words
-            fh = open('/usr/share/dict/words')
-            words = fh.read().splitlines()
-            fh.close()
-            shuffle(words)
+    def get_sentence():
+        return '''I have been Shreddited for privacy!'''
+    os_wordlist = '/usr/share/dict/words'
+    if os.name == 'posix' and os.path.isfile(os_wordlist):
+        # Generate a random string of words from our system's dictionary
+        fh = open(os_wordlist)
+        words = fh.read().splitlines()
+        fh.close()
+        shuffle(words)
+        def get_sentence():
+            return ' '.join(words[:randint(50, 150)])
 
-            def get_sentence():
-                return ' '.join(words[:randint(50, 150)])
-        except IOError:
-            def get_sentence():
-                return '''I have been Shreddited for privacy!\n\n\
-                        https://github.com/x89/Shreddit/'''
+assert get_sentence
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -106,7 +105,7 @@ else:
 
 for thing in things:
     thing_time = datetime.fromtimestamp(thing.created_utc)
-    # Exclude items from being deleted unless past X hours. 
+    # Exclude items from being deleted unless past X hours.
     after_time = datetime.utcnow() - timedelta(hours=hours)
     if thing_time > after_time:
         if thing_time + timedelta(hours=nuke_hours) < datetime.utcnow():
