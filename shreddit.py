@@ -155,7 +155,7 @@ for thing in things:
     thing_json = json.dumps(d)
     
     if isinstance(thing, Submission):
-        if verbose:
+        if verbose && keep_a_copy:
             print('Saving a copy of submission: #{id} {url}'.format(
                 id=thing.id,
                 url=thing.url)
