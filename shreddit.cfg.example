@@ -28,9 +28,6 @@ clear_vote = False
 # Overview: both submissions and comments. Comments / Submitted are as expected.
 item = overview 
 
-# Save comments and posts before deleting them?
-keep_a_copy = True
-
 # Anything in this list won't be deleted, coma delimited
 # spaces should work as .strip() is called after splitting
 # on comma.
@@ -57,5 +54,8 @@ whitelist_gilded = True
 # Can be used as a second deletion, as in "delete items older than 24 hours
 # except on whitelisted subreddits but after 3 months delete everything.
 nuke_hours = 0
+
+# Save a copy to disk of comments and posts before deleting them.
+keep_a_copy = False
 
 # vim: syntax=config

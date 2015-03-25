@@ -89,7 +89,7 @@ if keep_a_copy:
     if verbose:
         print("Saving {user}'s stuff in {name}".format(user=r.user, name=fname))
     copy_file = open(fname, 'w')
-    
+
 if verbose:
     print("Deleting messages before {time}.".format(
         time=datetime.now() - timedelta(hours=hours))
@@ -153,9 +153,9 @@ for thing in things:
     elif 'selftext_html' in d:
         del d['selftext_html']
     thing_json = json.dumps(d)
-    
+
     if isinstance(thing, Submission):
-        if verbose && keep_a_copy:
+        if verbose and keep_a_copy:
             print('Saving a copy of submission: #{id} {url}'.format(
                 id=thing.id,
                 url=thing.url)
@@ -180,11 +180,12 @@ for thing in things:
                 print('Editing {msg}'.format(msg=msg))
             else:
                 print('Editing and deleting {msg}'.format(msg=msg))
-        
+
         if keep_a_copy:
             copy_file.write(thing_json + '\n')
         thing.edit(replacement_text)
     if not edit_only:
         thing.delete()
 
-copy_file.close()
+if keep_a_copy:
+    copy_file.close()
