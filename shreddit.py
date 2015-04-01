@@ -53,7 +53,7 @@ clear_vote = config.getboolean('main', 'clear_vote')
 trial_run = config.getboolean('main', 'trial_run')
 edit_only = config.getboolean('main', 'edit_only')
 item = config.get('main', 'item')
-keep_a_copy = config.get('main', 'keep_a_copy')
+keep_a_copy = config.getboolean('main', 'keep_a_copy')
 whitelist_distinguished = config.getboolean('main', 'whitelist_distinguished')
 whitelist_gilded = config.getboolean('main', 'whitelist_gilded')
 nuke_hours = config.getint('main', 'nuke_hours')
@@ -63,7 +63,6 @@ _pass = config.get('main', 'password')
 r = praw.Reddit(user_agent="shreddit/3.2")
 if keep_a_copy:
     r.config.store_json_result = True
-
 
 def login(user=None, password=None):
     try:
