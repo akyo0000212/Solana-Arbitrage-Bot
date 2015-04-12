@@ -55,7 +55,4 @@ whitelist_gilded = True
 # except on whitelisted subreddits but after 3 months delete everything.
 nuke_hours = 0
 
-# Save a copy to disk of comments and posts before deleting them.
-keep_a_copy = False
-
 # vim: syntax=config

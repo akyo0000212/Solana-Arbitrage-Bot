@@ -53,16 +53,13 @@ clear_vote = config.getboolean('main', 'clear_vote')
 trial_run = config.getboolean('main', 'trial_run')
 edit_only = config.getboolean('main', 'edit_only')
 item = config.get('main', 'item')
-keep_a_copy = config.getboolean('main', 'keep_a_copy')
 whitelist_distinguished = config.getboolean('main', 'whitelist_distinguished')
 whitelist_gilded = config.getboolean('main', 'whitelist_gilded')
 nuke_hours = config.getint('main', 'nuke_hours')
 _user = config.get('main', 'username')
 _pass = config.get('main', 'password')
 
-r = praw.Reddit(user_agent="shreddit/3.2")
-if keep_a_copy:
-    r.config.store_json_result = True
+r = praw.Reddit(user_agent="shreddit/3.3")
 
 def login(user=None, password=None):
     try:
@@ -82,12 +79,6 @@ if not r.is_logged_in():
 
 if verbose:
     print("Logged in as {user}".format(user=r.user))
-
-if keep_a_copy:
-    fname = str(datetime.utcnow()).replace(':','')+'.txt'
-    if verbose:
-        print("Saving {user}'s stuff in {name}".format(user=r.user, name=fname))
-    copy_file = open(fname, 'w')
 
 if verbose:
     print("Deleting messages before {time}.".format(
@@ -145,22 +136,7 @@ for thing in things:
     if clear_vote:
         thing.clear_vote()
 
-    #html is not playing well with json
-    d = thing.json_dict
-    if 'body_html' in d:
-        del d['body_html']
-    elif 'selftext_html' in d:
-        del d['selftext_html']
-    thing_json = json.dumps(d)
-
     if isinstance(thing, Submission):
-        if verbose and keep_a_copy:
-            print('Saving a copy of submission: #{id} {url}'.format(
-                id=thing.id,
-                url=thing.url)
-            )
-        if keep_a_copy:
-            copy_file.write(thing_json + '\n')
         if verbose:
             print('Deleting submission: #{id} {url}'.format(
                 id=thing.id,
@@ -180,11 +156,6 @@ for thing in things:
             else:
                 print('Editing and deleting {msg}'.format(msg=msg))
 
-        if keep_a_copy:
-            copy_file.write(thing_json + '\n')
         thing.edit(replacement_text)
     if not edit_only:
         thing.delete()
-
-if keep_a_copy:
-    copy_file.close()
