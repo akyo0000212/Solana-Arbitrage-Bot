@@ -2,10 +2,10 @@ Shreddit
 -----------
 [![ScreenShot](https://raw.github.com/x89/Shreddit/master/youtube/youtube.png)](https://www.youtube.com/watch?v=HD-Vt_A_dDo)
 
-
+Donations
+-----------
   - Bitcoin: `17X2MCBkJXNdsshubHVHwNdtbq17eD2kMg`
   - PayPal: napalm10 on the good old gmail
-
 
 Details
 -----------
