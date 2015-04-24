@@ -1,5 +1,6 @@
 Shreddit
-###########
+-----------
+[![ScreenShot](https://raw.github.com/x89/Shreddit/master/youtube/youtube.png)](https://www.youtube.com/watch?v=HD-Vt_A_dDo)
 
 Details
 -----------
