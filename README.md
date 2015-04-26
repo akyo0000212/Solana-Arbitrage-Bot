@@ -46,6 +46,8 @@ Cron examples
 - Run once a month on the 1st of the month
 	`0 0 1 * * cd /home/$USER/Shreddit/ && source bin/activate && ./shreddit.py`
 
+If for some reason you get an error saying `source: not found` in your logs, change `source` to `.`. The source command would become `. bin/activate`. This is caused by your cron jobs running in shell, not bash, and the source command is a dot.
+
 Caveats
 -----------
 - Only your previous 1,000 comments are accessible on Reddit. So good luck deleting the others. There may be ways to hack around this via iterating using sorting by top/best/controversial/new but for now I am unsure. I believe it best to set the script settings and run it as a cron job and then it won't be a problem unless you post *a lot*. I do, however, think that it may be a caching issue and perhaps after a certain time period your post history would, once again, become available as a block of 1,000. So you needn't despair yet!
