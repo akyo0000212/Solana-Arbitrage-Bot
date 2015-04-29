@@ -4,7 +4,7 @@ Shreddit
 
 Donations
 -----------
-  - Bitcoin: `17X2MCBkJXNdsshubHVHwNdtbq17eD2kMg`
+  - Bitcoin: `1DbkBykTsfAk5ZbMdUsP3Qt1C6NfiURTp4`
   - PayPal: napalm10 on the good old gmail
 
 Details
