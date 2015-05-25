@@ -140,7 +140,7 @@ for thing in things:
         if verbose:
             print('Deleting submission: #{id} {url}'.format(
                 id=thing.id,
-                url=thing.url)
+                url=thing.url.encode('utf-8'))
             )
     elif isinstance(thing, Comment):
         replacement_text = get_sentence()
