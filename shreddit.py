@@ -56,6 +56,10 @@ item = config.get('main', 'item')
 whitelist_distinguished = config.getboolean('main', 'whitelist_distinguished')
 whitelist_gilded = config.getboolean('main', 'whitelist_gilded')
 nuke_hours = config.getint('main', 'nuke_hours')
+try:
+    max_score = config.getint('main', 'max_score')
+except ValueError:
+    max_score = None
 _user = config.get('main', 'username')
 _pass = config.get('main', 'password')
 
@@ -126,6 +130,8 @@ for thing in things:
     if whitelist_distinguished and thing.distinguished:
         continue
     if whitelist_gilded and thing.gilded:
+        continue
+    if max_score is not None and thing.score > max_score:
         continue
 
     if trial_run:  # Don't do anything, trial mode!
