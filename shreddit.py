@@ -123,14 +123,15 @@ for thing in things:
        thing.id in whitelist_ids:
         continue
 
+    if whitelist_distinguished and thing.distinguished:
+        continue
+    if whitelist_gilded and thing.gilded:
+        continue
+
     if trial_run:  # Don't do anything, trial mode!
         if verbose:
             print("Would have deleted {thing}: '{content}'".format(
                 thing=thing.id, content=thing))
-        continue
-    if whitelist_distinguished and thing.distinguished:
-        continue
-    if whitelist_gilded and thing.gilded:
         continue
 
     if clear_vote:
