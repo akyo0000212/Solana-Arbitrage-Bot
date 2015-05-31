@@ -60,10 +60,14 @@ try:
     max_score = config.getint('main', 'max_score')
 except ValueError:
     max_score = None
+save_directory = config.get('main', 'save_directory')
+
 _user = config.get('main', 'username')
 _pass = config.get('main', 'password')
 
 r = praw.Reddit(user_agent="shreddit/3.3")
+if save_directory:
+    r.config.store_json_result = True
 
 def login(user=None, password=None):
     try:
@@ -139,6 +143,12 @@ for thing in things:
             print("Would have deleted {thing}: '{content}'".format(
                 thing=thing.id, content=thing))
         continue
+
+    if save_directory:
+        if not os.path.exists(save_directory):
+            os.makedirs(save_directory)
+        with open("%s/%s.json" % (save_directory, thing.id), "w") as fh:
+            json.dump(thing.json_dict, fh)
 
     if clear_vote:
         thing.clear_vote()

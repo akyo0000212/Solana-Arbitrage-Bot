@@ -57,7 +57,9 @@ nuke_hours = 0
 
 # Only delete comments with this score or less, or delete all comments
 # if this is not set.
-
 max_score =
+
+# Save JSON encoded comment to this directory before deleting it.
+save_directory = 
 
 # vim: syntax=config
