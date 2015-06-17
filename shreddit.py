@@ -60,6 +60,8 @@ try:
     max_score = config.getint('main', 'max_score')
 except ValueError:
     max_score = None
+except TypeError:
+    max_score = None
 save_directory = config.get('main', 'save_directory')
 
 _user = config.get('main', 'username')
