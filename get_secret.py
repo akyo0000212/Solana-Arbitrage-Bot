@@ -22,7 +22,7 @@ r = praw.Reddit('Shreddit refresh token grabber')
 try:
     r.refresh_access_information()
 except HTTPException:
-    url = r.get_authorize_url('uniqueKey', 'identity', True)
+    url = r.get_authorize_url('uniqueKey', ['identity', 'read', 'vote', 'edit'], True)
     print("Please open: ", url)
     access_key = input("Enter your access key (secret param): ")
     deets = r.get_access_information(access_key)
