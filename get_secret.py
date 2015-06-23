@@ -15,22 +15,46 @@ refresh_access_information() instead of get_authorize_url() ->
 get_access_information().
 '''
 
-import praw
+import praw, asyncio
+from time import sleep
 from praw.errors import HTTPException
+from tornado import gen, web
+from tornado.ioloop import IOLoop
+from tornado.httpserver import HTTPServer
+
 r = praw.Reddit('Shreddit refresh token grabber')
+
+
+class Page(web.RequestHandler):
+    def get(self):
+        code = self.get_argument("code", default=None, strip=False)
+        self.write("Success! Your code: %s" % code)
+        IOLoop.current().stop()
+        self.login(code)
+
+    def login(self, code):
+        deets = r.get_access_information(code)
+        print("oauth_refresh_token (put in praw.ini): %s" % deets['refresh_token'])
+        r.set_access_credentials(**deets)
+        # TODO: Automatically update praw.ini with refresh_token
+
+application = web.Application([
+    (r"/authorize_callback", Page),
+])
 
 try:
     r.refresh_access_information()
 except HTTPException:
     url = r.get_authorize_url('uniqueKey', ['identity', 'read', 'vote', 'edit'], True)
     print("Please open: ", url)
-    access_key = input("Enter your access key (secret param): ")
-    deets = r.get_access_information(access_key)
-    print("oauth_refresh_token (put in praw.ini): %s" % deets['refresh_token'])
-    r.set_access_credentials(**deets)
+    server = HTTPServer(application)
+    server.listen(65010)
+    IOLoop.current().start()
 
 if r.user == None:
     print("Failed to log in. Something went wrong!")
 else:
-    print("Logged in as %s.\n" % r.user)
+    print("Logged in as %s." % r.user)
+
+print()
 
