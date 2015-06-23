@@ -10,7 +10,8 @@ from simpleconfigparser import simpleconfigparser
 from datetime import datetime, timedelta
 
 import praw
-from praw.errors import InvalidUser, InvalidUserPass, RateLimitExceeded
+from praw.errors import InvalidUser, InvalidUserPass, RateLimitExceeded, \
+                        HTTPException
 from praw.objects import Comment, Submission
 
 try:
@@ -67,28 +68,34 @@ save_directory = config.get('main', 'save_directory')
 _user = config.get('main', 'username')
 _pass = config.get('main', 'password')
 
-r = praw.Reddit(user_agent="shreddit/3.3")
+r = praw.Reddit(user_agent="shreddit/4.0")
 if save_directory:
     r.config.store_json_result = True
 
 def login(user=None, password=None):
     try:
-        if user and password:
-            r.login(_user, _pass)
-        else:
-            r.login()  # Let the user supply details
-    except InvalidUser as e:
-        raise InvalidUser("User does not exist.", e)
-    except InvalidUserPass as e:
-        raise InvalidUserPass("Specified an incorrect password.", e)
-    except RateLimitExceeded as e:
-        raise RateLimitExceeded("You're doing that too much.", e)
+        # This is OAuth 2
+        r.refresh_access_information()
+        if verbose:
+            print("Logged in with OAuth.")
+    except HTTPException:
+        try:
+            if user and password:
+                r.login(_user, _pass)
+            else:
+                r.login()  # Let the user supply details
+        except InvalidUser as e:
+            raise InvalidUser("User does not exist.", e)
+        except InvalidUserPass as e:
+            raise InvalidUserPass("Specified an incorrect password.", e)
+        except RateLimitExceeded as e:
+            raise RateLimitExceeded("You're doing that too much.", e)
 
 if not r.is_logged_in():
     login(user=_user, password=_pass)
 
 if verbose:
-    print("Logged in as {user}".format(user=r.user))
+    print("Logged in as {user}.".format(user=r.user))
 
 if verbose:
     print("Deleting messages before {time}.".format(
@@ -103,78 +110,83 @@ if verbose and whitelist:
         subs=', '.join(whitelist))
     )
 
-things = []
-if item == "comments":
-    things = r.user.get_comments(limit=None, sort=sort)
-elif item == "submitted":
-    things = r.user.get_submitted(limit=None, sort=sort)
-elif item == "overview":
-    things = r.user.get_overview(limit=None, sort=sort)
-else:
-    raise Exception("Your deletion section is wrong")
+def get_things(after=None):
+    if item == "comments":
+        return r.user.get_comments(limit=None, sort=sort)
+    elif item == "submitted":
+        return r.user.get_submitted(limit=None, sort=sort)
+    elif item == "overview":
+        return r.user.get_overview(limit=None, sort=sort)
+    else:
+        raise Exception("Your deletion section is wrong")
 
-for thing in things:
-    # Seems to be in users's timezone. Unclear.
-    thing_time = datetime.fromtimestamp(thing.created_utc)
-    # Exclude items from being deleted unless past X hours.
-    after_time = datetime.now() - timedelta(hours=hours)
-    if thing_time > after_time:
-        if thing_time + timedelta(hours=nuke_hours) < datetime.utcnow():
-            pass
-        continue
-    # For edit_only we're assuming that the hours aren't altered.
-    # This saves time when deleting (you don't edit already edited posts).
-    if edit_only:
-        end_time = after_time - timedelta(hours=hours)
-        if thing_time < end_time:
-                continue
+def remove_things(things):
+    for thing in things:
+        # Seems to be in users's timezone. Unclear.
+        thing_time = datetime.fromtimestamp(thing.created_utc)
+        # Exclude items from being deleted unless past X hours.
+        after_time = datetime.now() - timedelta(hours=hours)
+        if thing_time > after_time:
+            if thing_time + timedelta(hours=nuke_hours) < datetime.utcnow():
+                pass
+            continue
+        # For edit_only we're assuming that the hours aren't altered.
+        # This saves time when deleting (you don't edit already edited posts).
+        if edit_only:
+            end_time = after_time - timedelta(hours=hours)
+            if thing_time < end_time:
+                    continue
 
-    if str(thing.subreddit).lower() in whitelist or \
-       thing.id in whitelist_ids:
-        continue
+        if str(thing.subreddit).lower() in whitelist or \
+           thing.id in whitelist_ids:
+            continue
 
-    if whitelist_distinguished and thing.distinguished:
-        continue
-    if whitelist_gilded and thing.gilded:
-        continue
-    if max_score is not None and thing.score > max_score:
-        continue
+        if whitelist_distinguished and thing.distinguished:
+            continue
+        if whitelist_gilded and thing.gilded:
+            continue
+        if max_score is not None and thing.score > max_score:
+            continue
 
-    if trial_run:  # Don't do anything, trial mode!
-        if verbose:
-            print("Would have deleted {thing}: '{content}'".format(
-                thing=thing.id, content=thing))
-        continue
+        if trial_run:  # Don't do anything, trial mode!
+            if verbose:
+                print("Would have deleted {thing}: '{content}'".format(
+                    thing=thing.id, content=thing))
+            continue
 
-    if save_directory:
-        if not os.path.exists(save_directory):
-            os.makedirs(save_directory)
-        with open("%s/%s.json" % (save_directory, thing.id), "w") as fh:
-            json.dump(thing.json_dict, fh)
+        if save_directory:
+            if not os.path.exists(save_directory):
+                os.makedirs(save_directory)
+            with open("%s/%s.json" % (save_directory, thing.id), "w") as fh:
+                json.dump(thing.json_dict, fh)
 
-    if clear_vote:
-        thing.clear_vote()
+        if clear_vote:
+            thing.clear_vote()
 
-    if isinstance(thing, Submission):
-        if verbose:
-            print('Deleting submission: #{id} {url}'.format(
-                id=thing.id,
-                url=thing.url.encode('utf-8'))
-            )
-    elif isinstance(thing, Comment):
-        replacement_text = get_sentence()
-        if verbose:
-            msg = '/r/{3}/ #{0} with:\n\t"{1}" to\n\t"{2}"'.format(
-                thing.id,
-                sub(b'\n\r\t', ' ', thing.body[:78].encode('utf-8')),
-                replacement_text[:78],
-                thing.subreddit
-            )
-            if edit_only:
-                print('Editing {msg}'.format(msg=msg))
-            else:
-                print('Editing and deleting {msg}'.format(msg=msg))
+        if isinstance(thing, Submission):
+            if verbose:
+                print('Deleting submission: #{id} {url}'.format(
+                    id=thing.id,
+                    url=thing.url.encode('utf-8'))
+                )
+        elif isinstance(thing, Comment):
+            replacement_text = get_sentence()
+            if verbose:
+                msg = '/r/{3}/ #{0} with:\n\t"{1}" to\n\t"{2}"'.format(
+                    thing.id,
+                    sub(b'\n\r\t', ' ', thing.body[:78].encode('utf-8')),
+                    replacement_text[:78],
+                    thing.subreddit
+                )
+                if edit_only:
+                    print('Editing {msg}'.format(msg=msg))
+                else:
+                    print('Editing and deleting {msg}'.format(msg=msg))
 
-        thing.edit(replacement_text)
-    if not edit_only:
-        thing.delete()
+            thing.edit(replacement_text)
+        if not edit_only:
+            thing.delete()
+
+things = get_things()
+remove_things(things)
+
