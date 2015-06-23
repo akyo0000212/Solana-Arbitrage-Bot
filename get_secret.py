@@ -16,7 +16,6 @@ get_access_information().
 '''
 
 import praw, asyncio
-from time import sleep
 from praw.errors import HTTPException
 from tornado import gen, web
 from tornado.ioloop import IOLoop
