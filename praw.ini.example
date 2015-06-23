@@ -1,4 +1,10 @@
 [DEFAULT]
+# Will be deprecated sometime in 2015 (probably)
 user = 
 pswd = 
+# Oauth should be used instead
+oauth_client_id =
+oauth_client_secret =
+oauth_redirect_uri = 
+oauth_refresh_token =
 log_requests = 0
