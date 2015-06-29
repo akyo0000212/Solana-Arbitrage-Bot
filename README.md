@@ -2,11 +2,6 @@ Shreddit
 -----------
 [![ScreenShot](https://raw.github.com/x89/Shreddit/master/youtube/youtube.png)](https://www.youtube.com/watch?v=HD-Vt_A_dDo)
 
-Donations
------------
-  - Bitcoin: `1DbkBykTsfAk5ZbMdUsP3Qt1C6NfiURTp4`
-  - PayPal: napalm10 on the good old gmail
-
 Details
 -----------
 Shreddit is a Python command line program which will take a user's post history on the website Reddit (http://reddit.com) and after having the user edit a config file will systematically go through the user's history deleting one post/submission at a time until only those whitelisted remain.

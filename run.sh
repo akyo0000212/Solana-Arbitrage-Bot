@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 source ./bin/activate
 pip install --upgrade praw
-python ./shreddit.py 2>>./.errors
+python ./shreddit.py
