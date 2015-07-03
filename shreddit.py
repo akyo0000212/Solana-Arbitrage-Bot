@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 
 import praw
 from praw.errors import InvalidUser, InvalidUserPass, RateLimitExceeded, \
-                        HTTPException
+                        HTTPException, OAuthAppRequired
 from praw.objects import Comment, Submission
 
 try:
@@ -78,7 +78,7 @@ def login(user=None, password=None):
         r.refresh_access_information()
         if verbose:
             print("Logged in with OAuth.")
-    except HTTPException:
+    except (HTTPException, OAuthAppRequired) as e:
         try:
             if user and password:
                 r.login(_user, _pass)
