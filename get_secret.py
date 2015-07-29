@@ -15,7 +15,7 @@ refresh_access_information() instead of get_authorize_url() ->
 get_access_information().
 '''
 
-import praw, asyncio
+import praw
 from praw.errors import HTTPException
 from tornado import gen, web
 from tornado.ioloop import IOLoop
