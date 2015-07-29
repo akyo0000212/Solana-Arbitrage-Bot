@@ -185,9 +185,10 @@ def remove_things(things):
                     print('Editing and deleting {msg}'.format(msg=msg))
 
             thing.edit(replacement_text)
+            removal_count += 1  # rename?  this includes edits as well as deletions
         if not edit_only:
             thing.delete()
-            removal_count == 1
+            removal_count += 1
     return removal_count
 
 things = get_things()
