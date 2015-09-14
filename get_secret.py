@@ -8,7 +8,9 @@ apps here: https://www.reddit.com/prefs/apps/
 3. Run this script
 4. At the prompt copy the URL and open it in your browser. Allow access to your
 private app and it'll redirect you to a broken webpage.
-5. Copy the &secret=abc123 into refresh_token in praw.ini
+5. Copy the code printed into your console as the oauth_refresh_token and enter
+t in praw.ini
+6. All future requests through praw will use praw.ini to login with OAuth2
 
 Once client/secret/refresh are in praw.ini you only have to call
 refresh_access_information() instead of get_authorize_url() ->
@@ -44,7 +46,8 @@ application = web.Application([
 try:
     r.refresh_access_information()
 except HTTPException:
-    url = r.get_authorize_url('uniqueKey', ['identity', 'read', 'vote', 'edit'], True)
+    url = r.get_authorize_url('uniqueKey', ['identity', 'read', 'vote', 'edit',
+        'history'], True)
     print("Please open: ", url)
     server = HTTPServer(application)
     server.listen(65010)
