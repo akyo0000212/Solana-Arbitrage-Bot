@@ -111,12 +111,13 @@ if verbose and whitelist:
     )
 
 def get_things(after=None):
+    limit = 100
     if item == "comments":
-        return r.user.get_comments(limit=None, sort=sort)
+        return r.user.get_comments(limit=limit, sort=sort)
     elif item == "submitted":
-        return r.user.get_submitted(limit=None, sort=sort)
+        return r.user.get_submitted(limit=limit, sort=sort)
     elif item == "overview":
-        return r.user.get_overview(limit=None, sort=sort)
+        return r.user.get_overview(limit=limit, sort=sort)
     else:
         raise Exception("Your deletion section is wrong")
 
