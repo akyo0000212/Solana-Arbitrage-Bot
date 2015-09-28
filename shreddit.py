@@ -152,6 +152,8 @@ def remove_things(things):
 
         if trial_run:  # Don't do anything, trial mode!
             if verbose:
+                content = thing
+                content = str(content).encode('ascii', 'ignore')
                 print("Would have deleted {thing}: '{content}'".format(
                     thing=thing.id, content=thing))
             continue
