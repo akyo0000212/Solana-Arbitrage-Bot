@@ -111,7 +111,7 @@ if verbose and whitelist:
     )
 
 def get_things(after=None):
-    limit = None 
+    limit = None
     if item == "comments":
         return r.user.get_comments(limit=limit, sort=sort)
     elif item == "submitted":
