@@ -18,7 +18,9 @@ get_access_information().
 '''
 
 import praw
-from praw.errors import HTTPException
+import webbrowser
+from warnings import warn
+from praw.errors import HTTPException, OAuthAppRequired
 from tornado import gen, web
 from tornado.ioloop import IOLoop
 from tornado.httpserver import HTTPServer
@@ -29,26 +31,31 @@ r = praw.Reddit('Shreddit refresh token grabber')
 class Page(web.RequestHandler):
     def get(self):
         code = self.get_argument("code", default=None, strip=False)
-        self.write("Success! Your code: %s" % code)
+        self.write("Success! Your code: %s<br> \
+        It will now be appended to praw.ini and you \
+                should be able to enjoy Shreddit without storing \
+                your user / pass anywhere." % code)
         IOLoop.current().stop()
         self.login(code)
 
     def login(self, code):
         deets = r.get_access_information(code)
-        print("oauth_refresh_token (put in praw.ini): %s" % deets['refresh_token'])
+        print("oauth_refresh_token: %s" % deets['refresh_token'])
         r.set_access_credentials(**deets)
-        # TODO: Automatically update praw.ini with refresh_token
+        with open('praw.ini', mode='a') as fh:
+            fh.write('oauth_refresh_token = %s' % deets['refresh_token'])
+            print("Refresh token written to praw.ini")
 
-application = web.Application([
-    (r"/authorize_callback", Page),
-])
+application = web.Application([(r"/", Page)])
 
 try:
     r.refresh_access_information()
 except HTTPException:
-    url = r.get_authorize_url('uniqueKey', ['identity', 'read', 'vote', 'edit',
-        'history'], True)
-    print("Please open: ", url)
+    url = r.get_authorize_url('uniqueKey', ['identity', 'read', 'vote', 'edit', 'history'], True)
+    try:
+        webbrowser.open(url, new=2)
+    except NameError:
+        warn('''Couldn't open URL: %s\n please do so manually''' % url)
     server = HTTPServer(application)
     server.listen(65010)
     IOLoop.current().start()
