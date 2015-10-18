@@ -32,6 +32,7 @@ except ImportError:
         words = fh.read().splitlines()
         fh.close()
         shuffle(words)
+
         def get_sentence():
             return ' '.join(words[:randint(50, 150)])
 
@@ -112,6 +113,7 @@ if whitelist:
         subs=', '.join(whitelist))
     )
 
+
 def get_things(after=None):
     limit = None
     if item == "comments":
@@ -122,6 +124,7 @@ def get_things(after=None):
         return r.user.get_overview(limit=limit, sort=sort)
     else:
         raise Exception("Your deletion section is wrong")
+
 
 def remove_things(things):
     removal_count = 0
@@ -197,4 +200,3 @@ count = remove_things(things)
 while count != 0:
     things = get_things()
     count = remove_things(things)
-
