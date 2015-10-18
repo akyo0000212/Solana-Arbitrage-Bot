@@ -127,7 +127,6 @@ def get_things(after=None):
 
 
 def remove_things(things):
-    removal_count = 0
     for thing in things:
         # Seems to be in users's timezone. Unclear.
         thing_time = datetime.fromtimestamp(thing.created_utc)
@@ -192,11 +191,5 @@ def remove_things(things):
             thing.edit(replacement_text)
         if not edit_only:
             thing.delete()
-            removal_count += 1
-    return removal_count
 
-things = get_things()
-count = remove_things(things)
-while count != 0:
-    things = get_things()
-    count = remove_things(things)
+remove_things(get_things())
