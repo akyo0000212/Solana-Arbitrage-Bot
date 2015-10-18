@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import os
+import sys
+import logging
 import argparse
 import json
 
@@ -13,6 +15,10 @@ import praw
 from praw.errors import InvalidUser, InvalidUserPass, RateLimitExceeded, \
                         HTTPException, OAuthAppRequired
 from praw.objects import Comment, Submission
+
+logging.basicConfig(stream=sys.stdout)
+log = logging.getLogger(__name__)
+log.setLevel(level=logging.WARNING)
 
 try:
     from loremipsum import get_sentence  # This only works on Python 2
@@ -68,45 +74,41 @@ save_directory = config.get('main', 'save_directory')
 _user = config.get('main', 'username')
 _pass = config.get('main', 'password')
 
-r = praw.Reddit(user_agent="shreddit/4.0")
+r = praw.Reddit(user_agent="shreddit/4.1")
 if save_directory:
     r.config.store_json_result = True
 
-def login(user=None, password=None):
+if verbose:
+    log.setLevel(level=logging.INFO)
+
+try:
+    # Try to login with OAuth2
+    r.refresh_access_information()
+    log.debug("Logged in with OAuth.")
+except (HTTPException, OAuthAppRequired) as e:
+    log.warning("You should migrate to OAuth2 using get_secret.py before \
+            Reddit disables this login method.")
     try:
-        # This is OAuth 2
-        r.refresh_access_information()
-        if verbose:
-            print("Logged in with OAuth.")
-    except (HTTPException, OAuthAppRequired) as e:
         try:
-            if user and password:
-                r.login(_user, _pass)
-            else:
-                r.login()  # Let the user supply details
-        except InvalidUser as e:
-            raise InvalidUser("User does not exist.", e)
-        except InvalidUserPass as e:
-            raise InvalidUserPass("Specified an incorrect password.", e)
-        except RateLimitExceeded as e:
-            raise RateLimitExceeded("You're doing that too much.", e)
+            r.login(_user, _pass)
+        except InvalidUserPass:
+            r.login()  # Supply details on the command line
+    except InvalidUser as e:
+        raise InvalidUser("User does not exist.", e)
+    except InvalidUserPass as e:
+        raise InvalidUserPass("Specified an incorrect password.", e)
+    except RateLimitExceeded as e:
+        raise RateLimitExceeded("You're doing that too much.", e)
 
-if not r.is_logged_in():
-    login(user=_user, password=_pass)
-
-if verbose:
-    print("Logged in as {user}.".format(user=r.user))
-
-if verbose:
-    print("Deleting messages before {time}.".format(
-        time=datetime.now() - timedelta(hours=hours))
-    )
+log.info("Logged in as {user}.".format(user=r.user))
+log.debug("Deleting messages before {time}.".format(
+    time=datetime.now() - timedelta(hours=hours)))
 
 whitelist = [y.strip().lower() for y in whitelist.split(',')]
 whitelist_ids = [y.strip().lower() for y in whitelist_ids.split(',')]
 
-if verbose and whitelist:
-    print("Keeping messages from subreddits {subs}".format(
+if whitelist:
+    log.debug("Keeping messages from subreddits {subs}".format(
         subs=', '.join(whitelist))
     )
 
@@ -151,11 +153,10 @@ def remove_things(things):
             continue
 
         if trial_run:  # Don't do anything, trial mode!
-            if verbose:
-                content = thing
-                content = str(content).encode('ascii', 'ignore')
-                print("Would have deleted {thing}: '{content}'".format(
-                    thing=thing.id, content=thing))
+            content = thing
+            content = str(content).encode('ascii', 'ignore')
+            log.debug("Would have deleted {thing}: '{content}'".format(
+                thing=thing.id, content=thing))
             continue
 
         if save_directory:
@@ -168,27 +169,24 @@ def remove_things(things):
             thing.clear_vote()
 
         if isinstance(thing, Submission):
-            if verbose:
-                print('Deleting submission: #{id} {url}'.format(
-                    id=thing.id,
-                    url=thing.url.encode('utf-8'))
-                )
+            log.info('Deleting submission: #{id} {url}'.format(
+                id=thing.id,
+                url=thing.url.encode('utf-8'))
+            )
         elif isinstance(thing, Comment):
             replacement_text = get_sentence()
-            if verbose:
-                msg = '/r/{3}/ #{0} with:\n\t"{1}" to\n\t"{2}"'.format(
-                    thing.id,
-                    sub(b'\n\r\t', ' ', thing.body[:78].encode('utf-8')),
-                    replacement_text[:78],
-                    thing.subreddit
-                )
-                if edit_only:
-                    print('Editing {msg}'.format(msg=msg))
-                else:
-                    print('Editing and deleting {msg}'.format(msg=msg))
+            msg = '/r/{3}/ #{0} with:\n\t"{1}" to\n\t"{2}"'.format(
+                thing.id,
+                sub(b'\n\r\t', ' ', thing.body[:78].encode('utf-8')),
+                replacement_text[:78],
+                thing.subreddit
+            )
+            if edit_only:
+                log.info('Editing (not removing) {msg}'.format(msg=msg))
+            else:
+                log.info('Editing and deleting {msg}'.format(msg=msg))
 
             thing.edit(replacement_text)
-            removal_count += 1  # rename?  this includes edits as well as deletions
         if not edit_only:
             thing.delete()
             removal_count += 1
