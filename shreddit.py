@@ -155,8 +155,6 @@ def remove_things(things):
             continue
 
         if trial_run:  # Don't do anything, trial mode!
-            content = thing
-            content = str(content).encode('ascii', 'ignore')
             log.debug("Would have deleted {thing}: '{content}'".format(
                 thing=thing.id, content=thing))
             continue
