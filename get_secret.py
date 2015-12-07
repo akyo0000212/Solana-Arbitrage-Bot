@@ -5,7 +5,7 @@ authenticaton code for you and fires it into praw.ini.
 
 How to use:
     - Visit: https://www.reddit.com/prefs/apps
-    - Create new "script", under callback URL put http://127.0.0.1:65010
+    - Create new "script", under "redirect uri" put http://127.0.0.1:65010
     - Open praw.ini
         - oauth_client_id = { The ID displayed under the icon thingy }
         - oauth_client_secret = { The secret }
