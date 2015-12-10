@@ -1,0 +1,13 @@
+---
+- hosts: all 
+  vars:
+    user: x89
+  tasks:
+    - name: Update the Shreddit repository
+      git: repo=https://github.com/x89/Shreddit.git dest=/home/{{ user }}/Shreddit
+    - name: Ensure shreddit.cfg is correct
+      copy: src=/home/{{ user }}/ansible/shreddit.cfg dest=/home/{{ user }}/Shreddit/shreddit.cfg owner={{ user }} group={{ user }} mode=0600
+    - name: Ensure praw.ini is correct
+      copy: src=/home/{{ user }}/ansible/praw.ini dest=/home/{{ user }}/Shreddit/praw.ini owner={{ user }} group={{ user }} mode=0600
+    - name: Ensure Shreddit cron job
+      cron: user={{ user }} name="Shreddit" minute="0" job="cd /home/{{ user }}/Shreddit && bash -c 'source bin/activate && python shreddit.py' 2>/dev/null"
