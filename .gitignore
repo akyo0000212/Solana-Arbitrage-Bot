@@ -9,3 +9,4 @@ pip-selfcheck.json
 shreddit.conf
 praw.ini
 __pycache__/
+.*.swp
