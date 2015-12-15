@@ -1,13 +1,18 @@
 ---
-- hosts: all 
+- hosts: ro
   vars:
-    user: x89
+    user: napalm
+    install_dir: "/home/{{ user }}/Shreddit"
   tasks:
     - name: Update the Shreddit repository
-      git: repo=https://github.com/x89/Shreddit.git dest=/home/{{ user }}/Shreddit
+      git: repo=https://github.com/x89/Shreddit.git dest={{ install_dir }}
     - name: Ensure shreddit.cfg is correct
-      copy: src=/home/{{ user }}/ansible/shreddit.cfg dest=/home/{{ user }}/Shreddit/shreddit.cfg owner={{ user }} group={{ user }} mode=0600
+      copy: src=shreddit.cfg dest={{ install_dir }}/shreddit.cfg owner={{ user }} group={{ user }} mode=0600
     - name: Ensure praw.ini is correct
-      copy: src=/home/{{ user }}/ansible/praw.ini dest=/home/{{ user }}/Shreddit/praw.ini owner={{ user }} group={{ user }} mode=0600
+      copy: src=praw.ini dest={{ install_dir }}/praw.ini owner={{ user }} group={{ user }} mode=0600
+    - name: Run get_secret.py to check that we can login with oauth
+      shell: bash -c "source .venv/bin/activate && python get_secret.py" chdir={{ install_dir }}
     - name: Ensure Shreddit cron job
-      cron: user={{ user }} name="Shreddit" minute="0" job="cd /home/{{ user }}/Shreddit && bash -c 'source bin/activate && python shreddit.py' 2>/dev/null"
+      cron: user={{ user }} name="Shreddit" minute="0" job="cd {{ install_dir }} && bash -c 'source .venv/bin/activate && python shreddit.py' 2>/dev/null"
+    - name: Run a test Shreddit run
+      shell: bash -c "source .venv/bin/activate && python shreddit.py" chdir={{ install_dir }}
