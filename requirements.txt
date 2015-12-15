@@ -1,4 +1,4 @@
-decorator==4.0.5
+decorator==4.0.6
 praw==3.3.0
 requests==2.8.1
 SimpleConfigParser==0.1.0
