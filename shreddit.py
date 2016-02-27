@@ -155,7 +155,7 @@ def remove_things(things):
             continue
 
         if trial_run:  # Don't do anything, trial mode!
-            log.debug("Would have deleted {thing}: '{content}'".format(
+            log.info("Would have deleted {thing}: '{content}'".format(
                 thing=thing.id, content=thing))
             continue
 
