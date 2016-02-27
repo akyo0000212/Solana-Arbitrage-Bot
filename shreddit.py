@@ -153,17 +153,17 @@ def remove_things(things):
             continue
         if max_score is not None and thing.score > max_score:
             continue
-
-        if trial_run:  # Don't do anything, trial mode!
-            log.debug("Would have deleted {thing}: '{content}'".format(
-                thing=thing.id, content=thing))
-            continue
-
+  
         if save_directory:
             if not os.path.exists(save_directory):
                 os.makedirs(save_directory)
             with open("%s/%s.json" % (save_directory, thing.id), "w") as fh:
                 json.dump(thing.json_dict, fh)
+
+        if trial_run:  # Don't do anything, trial mode!
+            log.debug("Would have deleted {thing}: '{content}'".format(
+                thing=thing.id, content=thing))
+            continue
 
         if clear_vote:
             thing.clear_vote()
