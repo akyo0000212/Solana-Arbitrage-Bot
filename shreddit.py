@@ -165,6 +165,11 @@ def remove_things(things):
             with open("%s/%s.json" % (save_directory, thing.id), "w") as fh:
                 json.dump(thing.json_dict, fh)
 
+        if trial_run:  # Don't do anything, trial mode!
+            log.debug("Would have deleted {thing}: '{content}'".format(
+                thing=thing.id, content=thing))
+            continue
+
         if clear_vote:
             thing.clear_vote()
 
