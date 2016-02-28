@@ -7,6 +7,7 @@ pip-selfcheck.json
 *.cfg
 *.pyc
 shreddit.conf
+shreddit.yml
 praw.ini
 __pycache__/
 .*.swp
