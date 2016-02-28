@@ -1,10 +1,9 @@
-[main]
-
+---
 # Login details for Reddit. Fill out if you don't wish
 # to be prompted for a login every time you run Shreddit.
 ### NOTE: This may be deprecated as you can specify in praw.ini instead
-username = 
-password =
+username: null
+password: null
 
 # How many hours of comments you want to keep
 # 24 hours in a day,
@@ -12,54 +11,50 @@ password =
 # 672 hours in two fortnights,
 # 720 hours in a month (30 days),
 # 8766 hours in a year (365.25 days)
-hours = 24
+hours: 24
 
 # Options: new, top, controversial, more?
-sort = new
+sort: new
 
 # Enables print statements to notify you of what's going on
-verbose = True
+verbose: False
 
 # Removes your vote before deleting the item
-clear_vote = False
+clear_vote: False
 
 # Options: comments, submitted, overview
 # See: https://github.com/mellort/reddit_api/blob/master/reddit/objects.py#L359
 # Overview: both submissions and comments. Comments / Submitted are as expected.
-item = overview 
+item: submitted
 
 # Anything in this list won't be deleted, coma delimited
 # spaces should work as .strip() is called after splitting
 # on comma.
-whitelist = AskScience, TheCulture, redditdev, programming, charity
+whitelist: AskScience, TheCulture, redditdev, programming, charity, netsec
 
 # If you want any specific posts to be whitelisted stick 'em in here
-whitelist_ids =  
+whitelist_ids:
 
 # If you set this then no editing or deleting will be done
 # but the output from the program will be shown as an example
-trial_run = True
+trial_run: False
 
 # Don't delete but *do* edit, could prove... interesting to see a comment
 # with 5000 upvotes and it's just a lorem ipsum!
-edit_only = False
+edit_only: False
 
 # Ignore distinguished comments.
-whitelist_distinguished = True
+whitelist_distinguished: True
 
 # Ignore gilded (gold) comments
-whitelist_gilded = True
+whitelist_gilded: True
 
 # Delete everything older that this date, **This ignores whitelists**.
 # Can be used as a second deletion, as in "delete items older than 24 hours
 # except on whitelisted subreddits but after 3 months delete everything.
-nuke_hours = 0
+nuke_hours: 720
 
-# Only delete comments with this score or less, or delete all comments
-# if this is not set.
-max_score =
+# Save a copy to disk of comments and posts before deleting them.
+keep_a_copy: False
 
-# Save JSON encoded comment to this directory before deleting it.
-save_directory = 
-
-# vim: syntax=config
+# vim: syntax=yaml ts=2
