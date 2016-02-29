@@ -51,6 +51,7 @@ try:
 except HTTPException:
     url = r.get_authorize_url('uniqueKey', ['identity', 'read', 'vote', 'edit', 'history'], True)
     try:
+        print("Opening url: %s" % url)
         webbrowser.open(url, new=2)
     except NameError:
         warn('''Couldn't open URL: %s\n please do so manually''' % url)

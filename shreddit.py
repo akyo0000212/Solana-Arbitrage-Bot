@@ -5,13 +5,12 @@ import sys
 import logging
 import argparse
 import json
+import yaml
+import praw
 
 from re import sub
 from random import shuffle, randint
-from simpleconfigparser import simpleconfigparser
 from datetime import datetime, timedelta
-
-import praw
 from praw.errors import InvalidUser, InvalidUserPass, RateLimitExceeded, \
                         HTTPException, OAuthAppRequired
 from praw.objects import Comment, Submission
@@ -46,41 +45,23 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-config = simpleconfigparser()
+config = None
 if args.config:
     config.read(args.config)
 else:
-    config.read('shreddit.cfg')
+    with open('shreddit.yml', 'r') as fh:
+        config = yaml.safe_load(fh)
+if config is None:
+    raise Exception("No config options passed!")
 
-hours = config.getint('main', 'hours')
-whitelist = config.get('main', 'whitelist')
-whitelist_ids = config.get('main', 'whitelist_ids')
-sort = config.get('main', 'sort')
-verbose = config.getboolean('main', 'verbose')
-clear_vote = config.getboolean('main', 'clear_vote')
-trial_run = config.getboolean('main', 'trial_run')
-edit_only = config.getboolean('main', 'edit_only')
-item = config.get('main', 'item')
-whitelist_distinguished = config.getboolean('main', 'whitelist_distinguished')
-whitelist_gilded = config.getboolean('main', 'whitelist_gilded')
-nuke_hours = config.getint('main', 'nuke_hours')
-try:
-    max_score = config.getint('main', 'max_score')
-except ValueError:
-    max_score = None
-except TypeError:
-    max_score = None
-save_directory = config.get('main', 'save_directory')
+save_directory = config.get('save_directory', '.')
 
-_user = config.get('main', 'username')
-_pass = config.get('main', 'password')
-
-r = praw.Reddit(user_agent="shreddit/4.1")
+r = praw.Reddit(user_agent="shreddit/4.2")
 if save_directory:
     r.config.store_json_result = True
 
-if verbose:
-    log.setLevel(level=logging.INFO)
+if config.get('verbose', True):
+    log.setLevel(level=logging.DEBUG)
 
 try:
     # Try to login with OAuth2
@@ -91,7 +72,7 @@ except (HTTPException, OAuthAppRequired) as e:
             Reddit disables this login method.")
     try:
         try:
-            r.login(_user, _pass)
+            r.login(config['username'], config['password'])
         except InvalidUserPass:
             r.login()  # Supply details on the command line
     except InvalidUser as e:
@@ -103,12 +84,12 @@ except (HTTPException, OAuthAppRequired) as e:
 
 log.info("Logged in as {user}.".format(user=r.user))
 log.debug("Deleting messages before {time}.".format(
-    time=datetime.now() - timedelta(hours=hours)))
+    time=datetime.now() - timedelta(hours=config['hours'])))
 
-whitelist = [y.strip().lower() for y in whitelist.split(',')]
-whitelist_ids = [y.strip().lower() for y in whitelist_ids.split(',')]
+whitelist = config.get('whitelist', [])
+whitelist_ids = config.get('whitelist_ids', [])
 
-if whitelist:
+if config.get('whitelist'):
     log.debug("Keeping messages from subreddits {subs}".format(
         subs=', '.join(whitelist))
     )
@@ -116,6 +97,9 @@ if whitelist:
 
 def get_things(after=None):
     limit = None
+    item = config.get('item', 'comments')
+    sort = config.get('sort', 'new')
+    log.debug("Deleting items: {item}".format(item=item))
     if item == "comments":
         return r.user.get_comments(limit=limit, sort=sort)
     elif item == "submitted":
@@ -128,49 +112,46 @@ def get_things(after=None):
 
 def remove_things(things):
     for thing in things:
+        log.debug('Starting remove function on: {thing}'.format(thing=thing))
         # Seems to be in users's timezone. Unclear.
         thing_time = datetime.fromtimestamp(thing.created_utc)
         # Exclude items from being deleted unless past X hours.
-        after_time = datetime.now() - timedelta(hours=hours)
+        after_time = datetime.now() - timedelta(hours=config.get('hours', 24))
         if thing_time > after_time:
-            if thing_time + timedelta(hours=nuke_hours) < datetime.utcnow():
+            if thing_time + timedelta(hours=config.get('nuke_hours', 4320)) < datetime.utcnow():
                 pass
             continue
         # For edit_only we're assuming that the hours aren't altered.
         # This saves time when deleting (you don't edit already edited posts).
-        if edit_only:
-            end_time = after_time - timedelta(hours=hours)
+        if config.get('edit_only'):
+            end_time = after_time - timedelta(hours=config.get('hours', 24))
             if thing_time < end_time:
                     continue
 
-        if str(thing.subreddit).lower() in whitelist or \
-           thing.id in whitelist_ids:
+        if str(thing.subreddit).lower() in config.get('whitelist', []) \
+           or thing.id in config.get('whitelist_ids', []):
             continue
 
-        if whitelist_distinguished and thing.distinguished:
+        if config.get('whitelist_distinguished') and thing.distinguished:
             continue
-        if whitelist_gilded and thing.gilded:
+        if config.get('whitelist_gilded') and thing.gilded:
             continue
-        if max_score is not None and thing.score > max_score:
-            continue
-
-        if trial_run:  # Don't do anything, trial mode!
-            log.info("Would have deleted {thing}: '{content}'".format(
-                thing=thing.id, content=thing))
+        if 'max_score' in config and thing.score > config['max_score']:
             continue
 
-        if save_directory:
+        if config.get('save_directory'):
+            save_directory = config['save_directory']
             if not os.path.exists(save_directory):
                 os.makedirs(save_directory)
             with open("%s/%s.json" % (save_directory, thing.id), "w") as fh:
                 json.dump(thing.json_dict, fh)
 
-        if trial_run:  # Don't do anything, trial mode!
+        if config.get('trial_run'):  # Don't do anything, trial mode!
             log.debug("Would have deleted {thing}: '{content}'".format(
                 thing=thing.id, content=thing))
             continue
 
-        if clear_vote:
+        if config.get('clear_vote'):
             thing.clear_vote()
 
         if isinstance(thing, Submission):
@@ -186,13 +167,13 @@ def remove_things(things):
                 replacement_text[:78],
                 thing.subreddit
             )
-            if edit_only:
+            if config.get('edit_only'):
                 log.info('Editing (not removing) {msg}'.format(msg=msg))
             else:
                 log.info('Editing and deleting {msg}'.format(msg=msg))
 
             thing.edit(replacement_text)
-        if not edit_only:
+        if not config.get('edit_only'):
             thing.delete()
 
 remove_things(get_things())
