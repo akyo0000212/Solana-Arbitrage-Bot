@@ -3,7 +3,6 @@ decorator==4.0.6
 praw==3.3.0
 PyYAML==3.11
 requests==2.8.1
-SimpleConfigParser==0.1.0
 six==1.10.0
 tornado==4.3
 update-checker==0.11
