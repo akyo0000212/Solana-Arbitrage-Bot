@@ -45,12 +45,13 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-config = None
 if args.config:
-    config.read(args.config)
+    config_file = args.config
 else:
-    with open('shreddit.yml', 'r') as fh:
-        config = yaml.safe_load(fh)
+    config_file = 'shreddit.yml'
+
+with open(config_file, 'r') as fh:
+    config = yaml.safe_load(fh)
 if config is None:
     raise Exception("No config options passed!")
 
