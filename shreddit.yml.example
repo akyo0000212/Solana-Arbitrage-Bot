@@ -61,4 +61,11 @@ nuke_hours: 720
 keep_a_copy: False
 save_directory: /tmp
 
+# Replacement text format
+# Defines what you want to edit deleted content with pre-deletion (to ensure
+# it's not saved in their database).
+# Default: Random string. But this can be detected as spam in some cases.
+# options: [random, dot, "user entered string"]
+replacement_format: random
+
 # vim: syntax=yaml ts=2

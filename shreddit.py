@@ -161,13 +161,21 @@ def remove_things(things):
                 url=thing.url.encode('utf-8'))
             )
         elif isinstance(thing, Comment):
-            replacement_text = get_sentence()
+            rep_format = config.get('replacement_format')
+            if rep_format == 'random':
+                replacement_text = get_sentence()
+            elif rep_format == 'dot':
+                replacement_text = '.'
+            else:
+                replacement_text = rep_format
+
             msg = '/r/{3}/ #{0} with:\n\t"{1}" to\n\t"{2}"'.format(
                 thing.id,
                 sub(b'\n\r\t', ' ', thing.body[:78].encode('utf-8')),
                 replacement_text[:78],
                 thing.subreddit
             )
+                
             if config.get('edit_only'):
                 log.info('Editing (not removing) {msg}'.format(msg=msg))
             else:
