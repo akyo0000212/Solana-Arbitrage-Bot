@@ -65,7 +65,7 @@ For Windows users
 	- **Note:** Install either `python 2.x` or `python 3.x`, not both.
 2. Clone the repository (or download and extract the [zip file](https://github.com/dragsubil/Shreddit/archive/master.zip))
 3. Open command prompt and type `cd <path to the Shreddit folder>`
-4. Type `pip install -r requirements.txt` in open command prompt window to download and install the required additional modules.
+4. Type `pip install -r requirements.txt` in the open command prompt window to download and install the required additional modules.
 5. Open the `shreddit.yml.example` and edit it to your liking and rename the file to `your-config-filename.yml`.
 	- Make sure you specify your username and password in the file.
 	- See the [OAuth2 instructions](#oauth2-instructions) if you don't want to use username-password based authentication.
