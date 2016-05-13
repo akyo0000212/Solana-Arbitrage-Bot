@@ -2,8 +2,8 @@
 # Login details for Reddit. Fill out if you don't wish
 # to be prompted for a login every time you run Shreddit.
 ### NOTE: This may be deprecated as you can specify in praw.ini instead
-username: null
-password: null
+username:  
+password: 
 
 # How many hours of comments you want to keep
 # 24 hours in a day,

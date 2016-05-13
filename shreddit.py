@@ -11,8 +11,8 @@ import praw
 from re import sub
 from random import shuffle, randint
 from datetime import datetime, timedelta
-from praw.errors import InvalidUser, InvalidUserPass, RateLimitExceeded, \
-                        HTTPException, OAuthAppRequired
+from praw.errors import (InvalidUser, InvalidUserPass, RateLimitExceeded,
+                        HTTPException, OAuthAppRequired)
 from praw.objects import Comment, Submission
 
 logging.basicConfig(stream=sys.stdout)
@@ -24,6 +24,7 @@ try:
 except ImportError:
     def get_sentence():
         return '''I have been Shreddited for privacy!'''
+
     os_wordlist = '/usr/share/dict/words'
     if os.name == 'posix' and os.path.isfile(os_wordlist):
         # Generate a random string of words from our system's dictionary
@@ -69,8 +70,8 @@ try:
     r.refresh_access_information()
     log.debug("Logged in with OAuth.")
 except (HTTPException, OAuthAppRequired) as e:
-    log.warning("You should migrate to OAuth2 using get_secret.py before \
-            Reddit disables this login method.")
+    log.warning('''You should migrate to OAuth2 using get_secret.py before
+            Reddit disables this login method.''')
     try:
         try:
             r.login(config['username'], config['password'])
