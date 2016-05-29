@@ -4,8 +4,8 @@ virtualenv .
 source ./bin/activate
 pip install -r requirements.txt
 
-if [ ! -f "shreddit.cfg" ]; then
-	cp "shreddit.cfg.example" "shreddit.cfg"
-	$EDITOR shreddit.cfg
+if [ ! -f "shreddit.yml" ]; then
+	cp "shreddit.yml.example" "shreddit.yml"
+	$EDITOR shreddit.yml
 fi
 
