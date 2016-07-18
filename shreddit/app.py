@@ -2,8 +2,9 @@
 """
 import argparse
 import yaml
+import logging
 from shreddit.oauth import oauth_test
-from shreddit.shredder import shred
+from shreddit.shredder import Shredder
 
 
 def main():
@@ -22,7 +23,8 @@ def main():
     if not config:
         raise Exception("No config options passed!")
 
-    shred(config, args.praw)
+    shredder = Shredder(config, args.praw)
+    shredder.shred()
 
 
 if __name__ == "__main__":
