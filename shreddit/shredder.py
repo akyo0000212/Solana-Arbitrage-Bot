@@ -6,27 +6,10 @@ import json
 import yaml
 import praw
 from re import sub
-from random import shuffle, randint
 from datetime import datetime, timedelta
 from praw.errors import (InvalidUser, InvalidUserPass, RateLimitExceeded, HTTPException, OAuthAppRequired)
 from praw.objects import Comment, Submission
-try:
-    from loremipsum import get_sentence  # This only works on Python 2
-except ImportError:
-    def get_sentence():
-        return "I have been Shreddited for privacy!"
-
-    os_wordlist = "/usr/share/dict/words"
-    if os.name == "posix" and os.path.isfile(os_wordlist):
-        # Generate a random string of words from our system's dictionary
-        fh = open(os_wordlist)
-        words = fh.read().splitlines()
-        fh.close()
-        shuffle(words)
-
-        def get_sentence():
-            return " ".join(words[:randint(50, 150)])
-assert get_sentence
+from shreddit.util import get_sentence
 
 
 def shred(config, praw_ini=None):
