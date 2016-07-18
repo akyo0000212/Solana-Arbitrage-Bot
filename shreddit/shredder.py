@@ -114,8 +114,7 @@ def remove_things(r, config, log, things):
             if thing_time < end_time:
                     continue
 
-        if str(thing.subreddit).lower() in config.get("whitelist", []) \
-           or thing.id in config.get("whitelist_ids", []):
+        if str(thing.subreddit).lower() in config.get("whitelist", []) or thing.id in config.get("whitelist_ids", []):
             continue
 
         if config.get("whitelist_distinguished") and thing.distinguished:
@@ -141,10 +140,7 @@ def remove_things(r, config, log, things):
             thing.clear_vote()
 
         if isinstance(thing, Submission):
-            log.info("Deleting submission: #{id} {url}".format(
-                id=thing.id,
-                url=thing.url.encode("utf-8"))
-            )
+            log.info("Deleting submission: #{id} {url}".format(id=thing.id, url=thing.url.encode("utf-8")))
         elif isinstance(thing, Comment):
             rep_format = config.get("replacement_format")
             if rep_format == "random":
@@ -154,12 +150,9 @@ def remove_things(r, config, log, things):
             else:
                 replacement_text = rep_format
 
-            msg = '/r/{3}/ #{0} with:\n\t"{1}" to\n\t"{2}"'.format(
-                thing.id,
-                sub(b"\n\r\t", " ", thing.body[:78].encode("utf-8")),
-                replacement_text[:78],
-                thing.subreddit
-            )
+            msg = '/r/{3}/ #{0} with:\n\t"{1}" to\n\t"{2}"'.format(thing.id, sub(b"\n\r\t", " ",
+                                                                                 thing.body[:78].encode("utf-8")),
+                                                                   replacement_text[:78], thing.subreddit)
                 
             if config.get("edit_only"):
                 log.info("Editing (not removing) {msg}".format(msg=msg))
