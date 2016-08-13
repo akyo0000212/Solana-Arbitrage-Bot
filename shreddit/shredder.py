@@ -23,44 +23,30 @@ class Shredder(object):
         self._logger = logging.getLogger("shreddit")
         self._logger.setLevel(level=logging.DEBUG if config.get("verbose", True) else logging.INFO)
         self._logger.info(config)
+        self.__dict__.update({"_{}".format(k): config[k] for k in config})
 
         self._praw_ini = praw_ini
-        self._username, self._password = config["username"], config["password"]
         self._connect(praw_ini, self._username, self._password)
 
-        if config.get("save_directory", "."):
+        if self._save_directory:
             self._r.config.store_json_result = True
 
-        # Read some information from the config and store it
-        # TODO: Handle this in a much cleaner way
-        self._whitelist = set(config.get("whitelist", []))
-        self._whitelist_ids = set(config.get("whitelist_ids", []))
-        self._item = config.get("item", "comments")
-        self._sort = config.get("sort", "new")
-        self._whitelist_dist = config.get("whitelist_distinguished", False)
-        self._whitelist_gild = config.get("whitelist_gilded", False)
-        self._max_score = config.get("max_score", None)
-        self._recent_cutoff = arrow.now().replace(hours=-config.get("hours", 24))
-        self._nuke_cutoff = arrow.now().replace(hours=-config.get("nuke_hours", 4320))
-        self._save = config.get("save_directory", None)
-        self._trial = config.get("trial_run", False)
-        self._clear_vote = config.get("clear_vote", False)
-        self._repl_format = config.get("replacement_format")
-        self._edit_only = config.get("edit_only", False)
-        self._batch_cooldown = config.get("batch_cooldown", 10)
-        if self._save:
-            if not os.path.exists(self._save):
-                os.makedirs(self._save)
+        self._recent_cutoff = arrow.now().replace(hours=-self._hours)
+        self._nuke_cutoff = arrow.now().replace(hours=-self._nuke_hours)
+        if self._save_directory:
+            if not os.path.exists(self._save_directory):
+                os.makedirs(self._save_directory)
         self._limit = None
+
         self._logger.info("Deleting ALL items before {}".format(self._nuke_cutoff))
         self._logger.info("Deleting items not whitelisted until {}".format(self._recent_cutoff))
         self._logger.info("Ignoring ALL items after {}".format(self._recent_cutoff))
         self._logger.info("Targeting {} sorted by {}".format(self._item, self._sort))
         if self._whitelist:
             self._logger.info("Keeping items from subreddits {}".format(", ".join(self._whitelist)))
-        if self._save:
-            self._logger.info("Saving deleted items to: {}".format(self._save))
-        if self._trial:
+        if self._save_directory:
+            self._logger.info("Saving deleted items to: {}".format(self._save_directory))
+        if self._trial_run:
             self._logger.info("Trial run - no deletion will be performed")
 
     def shred(self):
@@ -107,28 +93,28 @@ class Shredder(object):
         """
         if str(item.subreddit).lower() in self._whitelist or item.id in self._whitelist_ids:
             return True
-        if self._whitelist_dist and item.distinguished:
+        if self._whitelist_distinguished and item.distinguished:
             return True
-        if self._whitelist_gild and item.gilded:
+        if self._whitelist_gilded and item.gilded:
             return True
         if self._max_score is not None and item.score > self._max_score:
             return True
         return False
 
     def _save_item(self, item):
-        with open(os.path.join(self._save, item.id), "w") as fh:
+        with open(os.path.join(self._save_directory, item.id), "w") as fh:
             json.dump(item.json_dict, fh)
 
     def _remove_submission(self, sub):
         self._logger.info("Deleting submission: #{id} {url}".format(id=sub.id, url=sub.url.encode("utf-8")))
 
     def _remove_comment(self, comment):
-        if self._repl_format == "random":
+        if self._replacement_format == "random":
             replacement_text = get_sentence()
-        elif self._repl_format == "dot":
+        elif self._replacement_format == "dot":
             replacement_text = "."
         else:
-            replacement_text = self._repl_format
+            replacement_text = self._replacement_format
 
         short_text = sub(b"\n\r\t", " ", comment.body[:35].encode("utf-8"))
         msg = "/r/{}/ #{} ({}) with: {}".format(comment.subreddit, comment.id, short_text, replacement_text)
@@ -137,11 +123,11 @@ class Shredder(object):
             self._logger.info("Editing (not removing) {msg}".format(msg=msg))
         else:
             self._logger.info("Editing and deleting {msg}".format(msg=msg))
-        if not self._trial:
+        if not self._trial_run:
             comment.edit(replacement_text)
 
     def _remove(self, item):
-        if self._save:
+        if self._save_directory:
             self._save_item(item)
         if self._clear_vote:
             item.clear_vote()
@@ -149,7 +135,7 @@ class Shredder(object):
             self._remove_submission(item)
         elif isinstance(item, Comment):
             self._remove_comment(item)
-        if not self._edit_only and not self._trial:
+        if not self._edit_only and not self._trial_run:
             item.delete()
 
     def _remove_things(self, items):

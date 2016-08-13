@@ -3,6 +3,7 @@
 import argparse
 import yaml
 import logging
+from shreddit import default_config
 from shreddit.oauth import oauth_test
 from shreddit.shredder import Shredder
 
@@ -19,11 +20,15 @@ def main():
         return
 
     with open(args.config or "shreddit.yml") as fh:
-        config = yaml.safe_load(fh)
-    if not config:
-        raise Exception("No config options passed!")
+        # Not doing a simple update() here because it's preferable to only set attributes that are "whitelisted" as
+        # configuration options in the form of default values.
+        user_config = yaml.safe_load(fh)
+        for option in default_config:
+            if option in user_config:
+                default_config[option] = user_config[option]
 
-    shredder = Shredder(config, args.praw)
+    # TODO: Validate config options
+    shredder = Shredder(default_config, args.praw)
     shredder.shred()
 
 
