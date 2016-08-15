@@ -22,7 +22,6 @@ class Shredder(object):
         logging.basicConfig()
         self._logger = logging.getLogger("shreddit")
         self._logger.setLevel(level=logging.DEBUG if config.get("verbose", True) else logging.INFO)
-        self._logger.info(config)
         self.__dict__.update({"_{}".format(k): config[k] for k in config})
 
         self._praw_ini = praw_ini
@@ -37,6 +36,7 @@ class Shredder(object):
             if not os.path.exists(self._save_directory):
                 os.makedirs(self._save_directory)
         self._limit = None
+        self._api_calls = []
 
         self._logger.info("Deleting ALL items before {}".format(self._nuke_cutoff))
         self._logger.info("Deleting items not whitelisted until {}".format(self._recent_cutoff))
@@ -44,18 +44,18 @@ class Shredder(object):
         self._logger.info("Targeting {} sorted by {}".format(self._item, self._sort))
         if self._whitelist:
             self._logger.info("Keeping items from subreddits {}".format(", ".join(self._whitelist)))
-        if self._save_directory:
+        if self._keep_a_copy and self._save_directory:
             self._logger.info("Saving deleted items to: {}".format(self._save_directory))
         if self._trial_run:
             self._logger.info("Trial run - no deletion will be performed")
 
     def shred(self):
         deleted = self._remove_things(self._get_things())
+        self._logger.info("Finished deleting {} items. ".format(deleted))
         if deleted >= 1000:
             # This user has more than 1000 items to handle, which angers the gods of the Reddit API. So chill for a
             # while and do it again.
-            self._logger.info("Finished deleting 1000 items. " \
-                              "Waiting {} seconds and continuing...".format(self._batch_cooldown))
+            self._logger.info("Waiting {} seconds and continuing...".format(self._batch_cooldown))
             time.sleep(self._batch_cooldown)
             self._connect(None, self._username, self._password)
             self.shred()
@@ -120,27 +120,38 @@ class Shredder(object):
         msg = "/r/{}/ #{} ({}) with: {}".format(comment.subreddit, comment.id, short_text, replacement_text)
             
         if self._edit_only:
-            self._logger.info("Editing (not removing) {msg}".format(msg=msg))
+            self._logger.debug("Editing (not removing) {msg}".format(msg=msg))
         else:
-            self._logger.info("Editing and deleting {msg}".format(msg=msg))
+            self._logger.debug("Editing and deleting {msg}".format(msg=msg))
         if not self._trial_run:
             comment.edit(replacement_text)
+            self._api_calls.append(int(time.time()))
 
     def _remove(self, item):
-        if self._save_directory:
+        if self._keep_a_copy and self._save_directory:
             self._save_item(item)
         if self._clear_vote:
             item.clear_vote()
+            self._api_calls.append(int(time.time()))
         if isinstance(item, Submission):
             self._remove_submission(item)
         elif isinstance(item, Comment):
             self._remove_comment(item)
         if not self._edit_only and not self._trial_run:
             item.delete()
+            self._api_calls.append(int(time.time()))
 
     def _remove_things(self, items):
-        for idx, item in enumerate(items):
-            self._logger.debug("Examining: {}".format(item))
+        self._logger.info("Loading items to delete...")
+        to_delete = [item for item in items]
+        self._logger.info("Done. Starting on batch of {} items...".format(len(to_delete)))
+        for idx, item in enumerate(to_delete):
+            minute_ago = arrow.now().replace(minutes=-1).timestamp
+            self._api_calls = [api_call for api_call in self._api_calls if api_call >= minute_ago]
+            if len(self._api_calls) >= 60:
+                self._logger.info("Sleeping 10 seconds to wait out API cooldown...")
+                time.sleep(10)
+            self._logger.debug("Examining item {}: {}".format(idx + 1, item))
             created = arrow.get(item.created_utc)
             if created <= self._nuke_cutoff:
                 self._logger.debug("Item occurs prior to nuke cutoff")
@@ -153,8 +164,6 @@ class Shredder(object):
                 continue
             else:
                 self._remove(item)
-            if not idx % 10:
-                self._logger.info("{} items handled.".format(idx + 1))
         return idx + 1
 
     def _get_things(self):
