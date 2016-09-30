@@ -87,7 +87,7 @@ try:
 except ImportError:
     # Module unavailable, use the default phrase
     pass
-os_wordlist = '/usr/share/dict/words'
+os_wordlist = config.get('wordlist', '/usr/share/dict/words')
 if os.name == 'posix' and os.path.isfile(os_wordlist):
     # Generate a random string of words from our system's dictionary
     fh = open(os_wordlist)
