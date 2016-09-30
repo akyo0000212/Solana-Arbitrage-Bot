@@ -7,9 +7,9 @@ import argparse
 import json
 import yaml
 import praw
+import random
 
 from re import sub
-from random import shuffle, randint
 from datetime import datetime, timedelta
 from praw.errors import (InvalidUser, InvalidUserPass, RateLimitExceeded,
                         HTTPException, OAuthAppRequired)
@@ -18,25 +18,6 @@ from praw.objects import Comment, Submission
 logging.basicConfig(stream=sys.stdout)
 log = logging.getLogger(__name__)
 log.setLevel(level=logging.DEBUG)
-
-try:
-    from loremipsum import get_sentence  # This only works on Python 2
-except ImportError:
-    def get_sentence():
-        return '''I have been Shreddited for privacy!'''
-
-    os_wordlist = '/usr/share/dict/words'
-    if os.name == 'posix' and os.path.isfile(os_wordlist):
-        # Generate a random string of words from our system's dictionary
-        fh = open(os_wordlist)
-        words = fh.read().splitlines()
-        fh.close()
-        shuffle(words)
-
-        def get_sentence():
-            return ' '.join(words[:randint(50, 150)])
-
-assert get_sentence
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -63,7 +44,7 @@ if save_directory:
     r.config.store_json_result = True
 
 if config.get('verbose', True):
-    log_level = config.get('debug', 'WARNING')  # Default to WARNING only
+    log_level = config.get('debug', 'DEBUG')
     log.setLevel(level=getattr(logging, log_level))
 
 try:
@@ -96,6 +77,24 @@ if config.get('whitelist'):
     log.debug("Keeping messages from subreddits {subs}".format(
         subs=', '.join(whitelist))
     )
+
+
+def get_sentence():
+    return '''I have been Shreddited for privacy!'''
+try:
+    # Provide a method that works on windows
+    from loremipsum import get_sentence
+except ImportError:
+    # Module unavailable, use the default phrase
+    pass
+os_wordlist = '/usr/share/dict/words'
+if os.name == 'posix' and os.path.isfile(os_wordlist):
+    # Generate a random string of words from our system's dictionary
+    fh = open(os_wordlist)
+    words = fh.read().splitlines()
+    fh.close()
+    def get_sentence():
+        return ' '.join(random.sample(words, random.randint(50,75)))
 
 
 def get_things(after=None):
