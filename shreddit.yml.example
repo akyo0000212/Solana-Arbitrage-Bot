@@ -2,8 +2,8 @@
 # Login details for Reddit. Fill out if you don't wish
 # to be prompted for a login every time you run Shreddit.
 ### NOTE: This may be deprecated as you can specify in praw.ini instead
-username:  
-password: 
+username:
+password:
 
 # How many hours of comments you want to keep
 # 24 hours in a day,
@@ -67,5 +67,9 @@ save_directory: /tmp
 # Default: Random string. But this can be detected as spam in some cases.
 # options: [random, dot, "user entered string"]
 replacement_format: random
+
+# Debug level, how much output you want
+# See: https://docs.python.org/3/library/logging.html#logging-levels
+debug: DEBUG
 
 # vim: syntax=yaml ts=2

@@ -17,7 +17,7 @@ from praw.objects import Comment, Submission
 
 logging.basicConfig(stream=sys.stdout)
 log = logging.getLogger(__name__)
-log.setLevel(level=logging.WARNING)
+log.setLevel(level=logging.DEBUG)
 
 try:
     from loremipsum import get_sentence  # This only works on Python 2
@@ -58,12 +58,13 @@ if config is None:
 
 save_directory = config.get('save_directory', '.')
 
-r = praw.Reddit(user_agent="shreddit/4.2")
+r = praw.Reddit(user_agent="shreddit/4.3")
 if save_directory:
     r.config.store_json_result = True
 
 if config.get('verbose', True):
-    log.setLevel(level=logging.DEBUG)
+    log_level = config.get('debug', 'WARNING')  # Default to WARNING only
+    log.setLevel(level=getattr(logging, log_level))
 
 try:
     # Try to login with OAuth2
@@ -176,7 +177,7 @@ def remove_things(things):
                 replacement_text[:78],
                 thing.subreddit
             )
-                
+
             if config.get('edit_only'):
                 log.info('Editing (not removing) {msg}'.format(msg=msg))
             else:
