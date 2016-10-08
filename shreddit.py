@@ -8,6 +8,7 @@ import json
 import yaml
 import praw
 import random
+import string
 
 from re import sub
 from datetime import datetime, timedelta
@@ -73,10 +74,11 @@ log.debug("Deleting messages before {time}.".format(
 whitelist = config.get('whitelist', [])
 whitelist_ids = config.get('whitelist_ids', [])
 
-if config.get('whitelist'):
+if whitelist:
     log.debug("Keeping messages from subreddits {subs}".format(
         subs=', '.join(whitelist))
     )
+    whitelist = set([string.lower(subr) for subr in whitelist])
 
 
 def get_sentence():
@@ -87,14 +89,19 @@ try:
 except ImportError:
     # Module unavailable, use the default phrase
     pass
-os_wordlist = config.get('wordlist', '/usr/share/dict/words')
-if os.name == 'posix' and os.path.isfile(os_wordlist):
-    # Generate a random string of words from our system's dictionary
-    fh = open(os_wordlist)
-    words = fh.read().splitlines()
-    fh.close()
-    def get_sentence():
-        return ' '.join(random.sample(words, random.randint(50,75)))
+
+if config.get('replacement_format') == 'random':
+    wordlist = config.get('wordlist')
+    if not wordlist:
+        os_wordlist = '/usr/share/dict/words'
+        if os.name == 'posix' and os.path.isfile(os_wordlist):
+            # Generate a random string of words from our system's dictionary
+            with open(os_wordlist) as fh:
+                wordlist = fh.read().splitlines()
+    if wordlist:
+        def get_sentence():
+            return ' '.join(random.sample(wordlist, min(len(wordlist),
+                                                        random.randint(50,75))))
 
 
 def get_things(after=None):
@@ -130,7 +137,7 @@ def remove_things(things):
             if thing_time < end_time:
                     continue
 
-        if str(thing.subreddit).lower() in config.get('whitelist', []) \
+        if str(thing.subreddit).lower() in whitelist \
            or thing.id in config.get('whitelist_ids', []):
             continue
 
