@@ -72,7 +72,8 @@ replacement_format: random
 # See: https://docs.python.org/3/library/logging.html#logging-levels
 debug: DEBUG
 
-# Define your own wordlist to use as substitution text
-wordlist: False
+# Define your own wordlist to use as substitution text when
+# replacement_format == random
+wordlist: []
 
 # vim: syntax=yaml ts=2
