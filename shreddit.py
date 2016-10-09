@@ -8,7 +8,6 @@ import json
 import yaml
 import praw
 import random
-import string
 
 from re import sub
 from datetime import datetime, timedelta
@@ -75,10 +74,10 @@ whitelist = config.get('whitelist', [])
 whitelist_ids = config.get('whitelist_ids', [])
 
 if whitelist:
+    whitelist = set([subr.lower() for subr in whitelist])
     log.debug("Keeping messages from subreddits {subs}".format(
         subs=', '.join(whitelist))
     )
-    whitelist = set([string.lower(subr) for subr in whitelist])
 
 
 def get_sentence():
