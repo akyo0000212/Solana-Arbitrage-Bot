@@ -1,4 +1,8 @@
 #!/usr/bin/env sh
-source ./bin/activate
+if [[ -f './bin/activate' ]]; then
+	source ./bin/activate
+elif [[ -f '.venv/bin/activate' ]]; then
+	source '.venv/bin/activate'
+fi	
 pip install --upgrade praw
 python ./shreddit.py
