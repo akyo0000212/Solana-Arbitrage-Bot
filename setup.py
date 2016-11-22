@@ -23,11 +23,12 @@ setup(
     url="https://github.com/scott-hand/Shreddit",
     author="Scott Hand",
     author_email="scott@vkgfx.com",
-    classifiers=["Development Status :: 3 - Alpha",
+    classifiers=["Development Status :: 4 - Beta",
                  "Intended Audience :: End Users/Desktop",
-                 "Programming Language :: Python :: 2"],
+                 "Programming Language :: Python"],
     packages=["shreddit"],
-    install_requires=requirements,
+    install_requires=["arrow", "backports-abc", "decorator", "praw", "PyYAML",
+                      "requests", "six", "tornado", "update-checker", "wheel"],
     entry_points={
         "console_scripts": [
             "shreddit=shreddit.app:main"
