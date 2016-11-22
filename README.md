@@ -70,6 +70,7 @@ Cron examples
 If virtualenv was used, be sure to add 
 `source /full/path/to/venv/bin/activate &&`
 before the command. For example:
+
 `0 * * * * source /full/path/to/venv/bin/activate && 
 shreddit -c <full path to shreddit.yml>`
 
