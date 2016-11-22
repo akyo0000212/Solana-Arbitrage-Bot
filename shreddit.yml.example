@@ -76,4 +76,8 @@ debug: DEBUG
 # replacement_format == random
 wordlist: []
 
+# Batch cooldown
+# This controls how long (in seconds) to wait between each set of 1000 deletions.
+batch_cooldown: 10
+
 # vim: syntax=yaml ts=2
