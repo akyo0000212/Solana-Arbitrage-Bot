@@ -95,17 +95,15 @@ For Windows users
 1. Make sure you have Python installed. 
    [Click here for the Python download page](https://www.python.org/downloads/).
 	- **Note:** Install either `python 2.x` or `python 3.x`, not both.
-2. Clone the repository (or download and extract the
-   [zip file](https://github.com/dragsubil/Shreddit/archive/master.zip))
-3. Open command prompt and type `cd <path to the Shreddit folder>`
-4. Type `pip install -r requirements.txt` in the open command prompt window to
-   download and install the required additional modules.
-5. Open the `shreddit.yml.example` and edit it to your liking and rename the
+2. Clone the repository (or download and extract the zip file)
+3. Open command prompt to the folder with the zip file (Shreddit-master.zip), 
+   and type `pip install -U Shreddit-master.zip`
+4. Open `shreddit.yml.example` in the zip edit it to your liking, and rename the
    file to `shreddit.yml`.
-	- Make sure you specify your username and password in the file.
+	- Make sure you specify credentials in the file.
 	- See the [OAuth2 instructions](#oauth2-instructions) if you don't want to
       use username-password based authentication.
-6. Type `shreddit` in the open command prompt window to run the program.
+5. Type `shreddit` in the open command prompt window to run the program.
 
 OAuth2 Instructions
 -------------------
