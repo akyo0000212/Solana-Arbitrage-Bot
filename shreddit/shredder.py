@@ -61,7 +61,7 @@ class Shredder(object):
             self.shred()
 
     def _connect(self, praw_ini, username, password):
-        self._r = praw.Reddit(user_agent="shreddit/4.2")
+        self._r = praw.Reddit(user_agent="shreddit/4.4")
         if praw_ini:
             # PRAW won't panic if the file is invalid, so check first
             if not os.path.exists(praw_ini):
@@ -118,7 +118,7 @@ class Shredder(object):
 
         short_text = sub(b"\n\r\t", " ", comment.body[:35].encode("utf-8"))
         msg = "/r/{}/ #{} ({}) with: {}".format(comment.subreddit, comment.id, short_text, replacement_text)
-            
+
         if self._edit_only:
             self._logger.debug("Editing (not removing) {msg}".format(msg=msg))
         else:
