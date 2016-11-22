@@ -36,32 +36,15 @@ scrubbed after a certain amount of time.
 
 Installation ([Click here for Windows instructions](#for-windows-users))
 ------------------------------------------------------------------------
-The way I personally install Shreddit is via a handy tool called `virtualenv`
-which may come with your package manager or may be a part of your Python package
-in your distro (have a search if you can't find it). Both Python 2 and 3 are
-supported.
-
 1. Clone the repository
-2. Enter the repository's directory and run `virtualenv .` (this creates a 
+2. Run `python setup.py install`. Usually this is run in the context of a
+   virtualenv or with administrative permissions for system-wide installation.
    virtual environment)
-3. Run the following command, you must run this *every time* you wish to run
-   the script `source ./bin/activate`.
-4. This installs the required modules locally to your Shreddit virtual
-   environment `pip install -r requirements.txt`.
-5. Copy `shreddit.yml.example` to something else and edit it to your liking.
-	- Make sure you specify your username and password in the file.
+3. Copy `shreddit.yml.example` to `shreddit.yml` and edit it to your liking.
+	- Make sure you specify your credentials in the file.
 	- See the [OAuth2 instructions](#oauth2-instructions) if you don't want to
       use username-password based authentication.
 
-Notes:
-
-- The script *does* work with Python versions 2 and 3 but people often get in a
-  mess with pip versions, python versions and virtulenv versions. Make sure
-  that your Python/pip/virtualenv are all the same version. If you ran the above
-  code it *should* work as stated.
-- If in doubt try running `python3` instead of just `python` - the same goes for
-  `pip3` and `virtualenv3` (exchange for 2 if you wish, though I advise using
-  version 2).
 - It's useful to have it run as an event, you can set this up as you like but I
   suggest `cron` via `crontab -e` and adding a line such as 
   `@hourly cd $HOME/Shreddit && source bin/activate && shreddit` See below for
@@ -76,18 +59,19 @@ Cron examples
   vixie-cron then each user can have their own personal cron job!
 
 - Run every hour on the hour
-	`0 * * * * cd /home/$USER/Shreddit/ && source bin/activate && ./shreddit.py`
+	`0 * * * * shreddit -c <full path to shreddit.yml>`
 
 - Run at 3am every morning
-	`0 3 * * * cd /home/$USER/Shreddit/ && source bin/activate && ./shreddit.py`
+	`0 3 * * * shreddit -c <full path to shreddit.yml>`
 
 - Run once a month on the 1st of the month
-	`0 0 1 * * cd /home/$USER/Shreddit/ && source bin/activate && ./shreddit.py`
+	`0 0 1 * * shreddit -c <full path to shreddit.yml>`
 
-If for some reason you get an error saying `source: not found` in your logs,
-change `source` to `.`. The source command would become `. bin/activate`. This
-is caused by your cron jobs running in shell, not bash, and the source command
-is a dot.
+If virtualenv was used, be sure to add 
+`source /full/path/to/venv/bin/activate &&`
+before the command. For example:
+`0 * * * * source /full/path/to/venv/bin/activate && 
+shreddit -c <full path to shreddit.yml>`
 
 For Windows users
 -----------------
