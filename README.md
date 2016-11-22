@@ -1,15 +1,15 @@
 Shreddit
-=======
+========
 
 YAML Upgrade
------------
+------------
 
 **Note! Important! The latest version uses YAML format over the old
 simpleconfigparser! This means you'll have to migrate your config file to
 yaml!**
 
 User Login deprecation
---------------------
+----------------------
 
 Reddit intends to disable username-password based authentication to access its
 APIs in the near future. You can specify your username and password in the
@@ -21,9 +21,9 @@ Description
 -----------
 
 Shreddit is a Python command line program which will take a user's post history
-on the website [Reddit](http://reddit.com) and after having the user edit a
-config file will systematically go through the user's history deleting one
-post/submission at a time until only those whitelisted remain.
+on the website [Reddit](http://reddit.com), and will systematically go through
+the user's history deleting one post/submission at a time until only those
+whitelisted remain.
 
 **Note:** When it became known that post edits were *not* saved but post
 deletions *were* saved, code was added to edit your post prior to deletion. In
@@ -31,11 +31,11 @@ fact you can actually turn off deletion all together and just have lorem ipsum
 (or a message about Shreddit) but this will increase how long it takes the
 script to run as it will be going over all of your messages every run!
 
-Basically it lets you maintain your normal reddit account while having your
-history scrubbed after a certain amount of time.
+It allows you to maintain your normal reddit account while having your history
+scrubbed after a certain amount of time.
 
 Installation ([Click here for Windows instructions](#for-windows-users))
------------
+------------------------------------------------------------------------
 The way I personally install Shreddit is via a handy tool called `virtualenv`
 which may come with your package manager or may be a part of your Python package
 in your distro (have a search if you can't find it). Both Python 2 and 3 are
@@ -52,11 +52,6 @@ supported.
 	- Make sure you specify your username and password in the file.
 	- See the [OAuth2 instructions](#oauth2-instructions) if you don't want to
       use username-password based authentication.
-6. Run `python shreddit.py -c YOUR_CONFIG_FILE.yml`.
-
-Alternatively try to run `./install.sh` and it will attempt to do it all for
-you.
-
 
 Notes:
 
@@ -69,15 +64,15 @@ Notes:
   version 2).
 - It's useful to have it run as an event, you can set this up as you like but I
   suggest `cron` via `crontab -e` and adding a line such as 
-  `@hourly cd $HOME/Shreddit && source bin/activate && 
-   python shreddit.py -c YOUR_CONFIG_FILE.cfg`.
-  See below for more.
+  `@hourly cd $HOME/Shreddit && source bin/activate && shreddit` See below for
+  more.
 - Adding your password to the praw.ini and adding the additional output line
   can provide extra debugging help.
 
 Cron examples
------------
-- Run crontab -e to edit your cron file. If you have access to something like
+-------------
+
+- Run `crontab -e` to edit your cron file. If you have access to something like
   vixie-cron then each user can have their own personal cron job!
 
 - Run every hour on the hour
@@ -96,7 +91,8 @@ is a dot.
 
 For Windows users
 -----------------
-1. Make sure you have python installed. 
+
+1. Make sure you have Python installed. 
    [Click here for the Python download page](https://www.python.org/downloads/).
 	- **Note:** Install either `python 2.x` or `python 3.x`, not both.
 2. Clone the repository (or download and extract the
@@ -105,15 +101,15 @@ For Windows users
 4. Type `pip install -r requirements.txt` in the open command prompt window to
    download and install the required additional modules.
 5. Open the `shreddit.yml.example` and edit it to your liking and rename the
-   file to `your-config-filename.yml`.
+   file to `shreddit.yml`.
 	- Make sure you specify your username and password in the file.
 	- See the [OAuth2 instructions](#oauth2-instructions) if you don't want to
       use username-password based authentication.
-6. Type `python shreddit.py -c your-config-filename.yml` in the open command
-   prompt window to run the program.
+6. Type `shreddit` in the open command prompt window to run the program.
 
 OAuth2 Instructions
 -------------------
+
 1. Visit: https://www.reddit.com/prefs/apps
 2. Click on 'Create app'. 
 	- Fill in the name and select the 'script' option
@@ -131,15 +127,11 @@ OAuth2 Instructions
 
 
 Caveats
------------
-- Only your previous 1,000 comments are accessible on Reddit. So good luck
-  deleting the others. There may be ways to hack around this via iterating
-  using sorting by top/best/controversial/new but for now I am unsure. I
-  believe it best to set the script settings and run it as a cron job and then
-  it won't be a problem unless you post *a lot*. I do, however, think that it
-  may be a caching issue and perhaps after a certain time period your post
-  history would, once again, become available as a block of 1,000. So you
-  needn't despair yet!
+-------
+
+- Certain limitations in the Reddit API and the PRAW library make it difficult
+  to delete more than 1,000 comments. While deleting >1000 comments is planned,
+  it is necessary right now to rerun the program until they are all deleted.
 
 - We are relying on Reddit admin words that they do not store edits, deleted
   posts are still stored in the database they are merely inaccessible to the
