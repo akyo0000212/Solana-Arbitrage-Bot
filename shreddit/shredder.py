@@ -9,7 +9,8 @@ import praw
 import time
 from re import sub
 from datetime import datetime, timedelta
-from praw.errors import (InvalidUser, InvalidUserPass, RateLimitExceeded, HTTPException, OAuthAppRequired)
+from praw.errors import (InvalidUser, InvalidUserPass, RateLimitExceeded,
+    HTTPException, OAuthAppRequired)
 from praw.objects import Comment, Submission
 from shreddit.util import get_sentence
 
@@ -131,8 +132,11 @@ class Shredder(object):
         if self._keep_a_copy and self._save_directory:
             self._save_item(item)
         if self._clear_vote:
-            item.clear_vote()
-            self._api_calls.append(int(time.time()))
+            try:
+                item.clear_vote()
+                self._api_calls.append(int(time.time()))
+            except HTTPException:
+                self._logger.debug("Couldn't clear vote on {item}".format(item=item))
         if isinstance(item, Submission):
             self._remove_submission(item)
         elif isinstance(item, Comment):
