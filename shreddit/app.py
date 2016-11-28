@@ -3,6 +3,8 @@
 import argparse
 import yaml
 import logging
+import os
+import pkg_resources
 from shreddit import default_config
 from shreddit.oauth import oauth_test
 from shreddit.shredder import Shredder
@@ -19,7 +21,14 @@ def main():
         oauth_test(args.praw)
         return
 
-    with open(args.config or "shreddit.yml") as fh:
+    config_filename = args.config or "shreddit.yml"
+    if not os.path.isfile(config_filename):
+        print("No configuration file could be found. Paste the following into a file called \"shreddit.yml\" and " \
+                "try running shreddit again:\n\n")
+        print(pkg_resources.resource_string("shreddit", "shreddit.yml.example"))
+        return
+
+    with open(config_filename) as fh:
         # Not doing a simple update() here because it's preferable to only set attributes that are "whitelisted" as
         # configuration options in the form of default values.
         user_config = yaml.safe_load(fh)
