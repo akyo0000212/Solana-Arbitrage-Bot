@@ -1,5 +1,6 @@
 shreddit.yml
 praw.ini
+Makefile
 
 # Docs
 docs/_build/
