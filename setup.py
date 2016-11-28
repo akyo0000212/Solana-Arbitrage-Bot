@@ -12,17 +12,14 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, "README.md"), encoding='utf-8') as filein:
     long_description = filein.read()
 
-with open(path.join(here, "requirements.txt"), encoding="utf-8") as filein:
-    requirements = [line.strip() for line in filein.readlines()]
-
 setup(
     name="shreddit",
     version=VERSION,
     description=DESCRIPTION,
     long_description=long_description,
-    url="https://github.com/scott-hand/Shreddit",
-    author="Scott Hand",
-    author_email="scott@vkgfx.com",
+    url="https://github.com/x89/Shreddit",
+    author="David John",
+    author_email="david@vaunt.eu",
     classifiers=["Development Status :: 4 - Beta",
                  "Intended Audience :: End Users/Desktop",
                  "Programming Language :: Python"],
