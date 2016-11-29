@@ -79,7 +79,7 @@ class Shredder(object):
             self.shred()
 
     def _connect(self, praw_ini, username, password):
-        self._r = praw.Reddit(user_agent="shreddit/4.4")
+        self._r = praw.Reddit(user_agent="shreddit/5.0")
         if praw_ini:
             # PRAW won't panic if the file is invalid, so check first
             if not os.path.exists(praw_ini):
