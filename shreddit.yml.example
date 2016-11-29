@@ -38,6 +38,10 @@ whitelist: [AskScience, TheCulture, redditdev, programming, charity, netsec]
 # If you want any specific posts to be whitelisted stick 'em in here
 whitelist_ids: []
 
+# If you want to whitelist or blacklist specific multireddits, add them here
+multi_blacklist: []
+multi_whitelist: []
+
 # If you set this then no editing or deleting will be done
 # but the output from the program will be shown as an example
 trial_run: False

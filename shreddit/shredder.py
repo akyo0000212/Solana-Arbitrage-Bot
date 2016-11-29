@@ -39,12 +39,29 @@ class Shredder(object):
         self._limit = None
         self._api_calls = []
 
+        # Add any multireddit subreddits to the whitelist
+        self._whitelist = set([s.lower() for s in self._whitelist])
+        for username, multiname in self._multi_whitelist:
+            multireddit = self._r.get_multireddit(username, multiname)
+            for subreddit in multireddit.subreddits:
+                self._whitelist.add(str(subreddit).lower())
+
+        # Add any multireddit subreddits to the blacklist
+        self._blacklist = set()
+        for username, multiname in self._multi_blacklist:
+            multireddit = self._r.get_multireddit(username, multiname)
+            for subreddit in multireddit.subreddits:
+                self._blacklist.add(str(subreddit).lower())
+
+
         self._logger.info("Deleting ALL items before {}".format(self._nuke_cutoff))
         self._logger.info("Deleting items not whitelisted until {}".format(self._recent_cutoff))
         self._logger.info("Ignoring ALL items after {}".format(self._recent_cutoff))
         self._logger.info("Targeting {} sorted by {}".format(self._item, self._sort))
+        if self._blacklist:
+            self._logger.info("Deleting ALL items from subreddits {}".format(", ".join(list(self._blacklist))))
         if self._whitelist:
-            self._logger.info("Keeping items from subreddits {}".format(", ".join(self._whitelist)))
+            self._logger.info("Keeping items from subreddits {}".format(", ".join(list(self._whitelist))))
         if self._keep_a_copy and self._save_directory:
             self._logger.info("Saving deleted items to: {}".format(self._save_directory))
         if self._trial_run:
@@ -89,7 +106,7 @@ class Shredder(object):
                 raise RateLimitExceeded("You're doing that too much.", e)
         self._logger.info("Logged in as {user}.".format(user=self._r.user))
 
-    def _check_item(self, item):
+    def _check_whitelist(self, item):
         """Returns True if the item is whitelisted, False otherwise.
         """
         if str(item.subreddit).lower() in self._whitelist or item.id in self._whitelist_ids:
@@ -157,14 +174,17 @@ class Shredder(object):
                 time.sleep(10)
             self._logger.debug("Examining item {}: {}".format(idx + 1, item))
             created = arrow.get(item.created_utc)
+            if str(item.subreddit).lower() in self._blacklist:
+                self._logger.debug("Deleting due to blacklist")
+                self._remove(item)
+            elif self._check_whitelist(item):
+                self._logger.debug("Skipping due to: whitelisted")
+                continue
             if created <= self._nuke_cutoff:
                 self._logger.debug("Item occurs prior to nuke cutoff")
                 self._remove(item)
             elif created > self._recent_cutoff:
                 self._logger.debug("Skipping due to: too recent")
-                continue
-            elif self._check_item(item):
-                self._logger.debug("Skipping due to: whitelisted")
                 continue
             else:
                 self._remove(item)
