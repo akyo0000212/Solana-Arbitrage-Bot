@@ -1,6 +1,7 @@
 ---
 # Login details for Reddit. Fill out if you don't wish
 # to be prompted for a login every time you run Shreddit.
+# If your username or password has characters that could cause problems, surround them in quotes.
 ### NOTE: This may be deprecated as you can specify in praw.ini instead
 username:
 password:
@@ -37,6 +38,15 @@ whitelist: [AskScience, TheCulture, redditdev, programming, charity, netsec]
 
 # If you want any specific posts to be whitelisted stick 'em in here
 whitelist_ids: []
+
+# If you want to whitelist or blacklist specific multireddits, add them here
+# Each one must be a list of 2 elements: username, multireddit
+# Example:
+# multi_blacklist:
+#     - [myusername, mymulti]
+#     - [someotheruser, theirmulti]
+multi_blacklist: []
+multi_whitelist: []
 
 # If you set this then no editing or deleting will be done
 # but the output from the program will be shown as an example
