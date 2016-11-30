@@ -3,8 +3,10 @@
 import random
 
 
-WORDLIST = "/usr/share/dict/words"
-STATIC_TEXT = "I have been Shreddited for privacy!"
+LOREM = """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean sit amet nulla id mi imperdiet condimentum. \
+           Vestibulum ac consequat lorem, eu tempus felis. Maecenas eget purus in nisi blandit volutpat. Aenean \
+           bibendum eros sit amet ex rhoncus, eu porta magna sodales. Sed venenatis sapien sit amet tempor euismod. \
+           Ut a neque purus. Vestibulum quis tortor non leo eleifend interdum."""
 
 
 try:
@@ -16,9 +18,6 @@ except ImportError:
         replacement. The current solution is to return a static text string unless the operating system has a word list.
         If that is the case, use it instead.
         """
-        try:
-            lines = [line.strip() for line in open(WORDLIST).readlines()]
-            return " ".join(random.sample(lines, random.randint(50, 150)))
-        except IOError:
-            # The word list wasn't available...
-            return STATIC_TEXT
+        words = LOREM.split()
+        random.shuffle(words)
+        return " ".join(words)
