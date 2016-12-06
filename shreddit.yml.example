@@ -1,11 +1,4 @@
 ---
-# Credentials go here. If you are unsure what to put in client_id and client_secret, please consult the README for more
-# information.
-client_id: 
-client_secret: 
-username:
-password:
-
 # How many hours of comments you want to keep
 # 24 hours in a day,
 # 168 hours in a week,
