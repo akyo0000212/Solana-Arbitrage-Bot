@@ -1,32 +1,30 @@
-import os
-import sys
-import logging
+import arrow
 import argparse
 import json
-import arrow
-import yaml
+import logging
+import os
 import praw
+import sys
 import time
-from re import sub
+import yaml
 from datetime import datetime, timedelta
-from praw.errors import (InvalidUser, InvalidUserPass, RateLimitExceeded,
-    HTTPException, OAuthAppRequired)
-from praw.objects import Comment, Submission
-from shreddit.util import get_sentence
+from praw.models import Comment, Submission
+from prawcore.exceptions import ResponseException, OAuthException
+from re import sub
+from shreddit.util import get_sentence, ShredditError
 
 
 class Shredder(object):
     """This class stores state for configuration, API objects, logging, etc. It exposes a shred() method that
     application code can call to start it.
     """
-    def __init__(self, config, praw_ini=None):
+    def __init__(self, config, user):
         logging.basicConfig()
         self._logger = logging.getLogger("shreddit")
         self._logger.setLevel(level=logging.DEBUG if config.get("verbose", True) else logging.INFO)
         self.__dict__.update({"_{}".format(k): config[k] for k in config})
 
-        self._praw_ini = praw_ini
-        self._connect(praw_ini, self._username, self._password)
+        self._connect(user)
 
         if self._save_directory:
             self._r.config.store_json_result = True
@@ -36,8 +34,6 @@ class Shredder(object):
         if self._save_directory:
             if not os.path.exists(self._save_directory):
                 os.makedirs(self._save_directory)
-        self._limit = None
-        self._api_calls = []
 
         # Add any multireddit subreddits to the whitelist
         self._whitelist = set([s.lower() for s in self._whitelist])
@@ -68,7 +64,7 @@ class Shredder(object):
             self._logger.info("Trial run - no deletion will be performed")
 
     def shred(self):
-        deleted = self._remove_things(self._get_things())
+        deleted = self._remove_things(self._build_iterator())
         self._logger.info("Finished deleting {} items. ".format(deleted))
         if deleted >= 1000:
             # This user has more than 1000 items to handle, which angers the gods of the Reddit API. So chill for a
@@ -78,33 +74,14 @@ class Shredder(object):
             self._connect(None, self._username, self._password)
             self.shred()
 
-    def _connect(self, praw_ini, username, password):
-        self._r = praw.Reddit(user_agent="shreddit/5.0")
-        if praw_ini:
-            # PRAW won't panic if the file is invalid, so check first
-            if not os.path.exists(praw_ini):
-                print("PRAW configuration file \"{}\" not found.".format(praw_ini))
-                return
-            praw.settings.CONFIG.read(praw_ini)
+    def _connect(self, user):
         try:
-            # Try to login with OAuth2
-            self._r.refresh_access_information()
-            self._logger.debug("Logged in with OAuth.")
-        except (HTTPException, OAuthAppRequired) as e:
-            self._logger.warning("You should migrate to OAuth2 using get_secret.py before Reddit disables this login "
-                                 "method.")
-            try:
-                try:
-                    self._r.login(username, password)
-                except InvalidUserPass:
-                    self._r.login()  # Supply details on the command line
-            except InvalidUser as e:
-                raise InvalidUser("User does not exist.", e)
-            except InvalidUserPass as e:
-                raise InvalidUserPass("Specified an incorrect password.", e)
-            except RateLimitExceeded as e:
-                raise RateLimitExceeded("You're doing that too much.", e)
-        self._logger.info("Logged in as {user}.".format(user=self._r.user))
+            self._r = praw.Reddit(user, user_agent="python:shreddit:v6.0.0")
+            self._logger.info("Logged in as {user}.".format(user=self._r.user.me()))
+        except ResponseException:
+            raise ShredditError("Bad OAuth credentials")
+        except OAuthException:
+            raise ShredditError("Bad username or password")
 
     def _check_whitelist(self, item):
         """Returns True if the item is whitelisted, False otherwise.
@@ -137,13 +114,9 @@ class Shredder(object):
         short_text = sub(b"\n\r\t", " ", comment.body[:35].encode("utf-8"))
         msg = "/r/{}/ #{} ({}) with: {}".format(comment.subreddit, comment.id, short_text, replacement_text)
 
-        if self._edit_only:
-            self._logger.debug("Editing (not removing) {msg}".format(msg=msg))
-        else:
-            self._logger.debug("Editing and deleting {msg}".format(msg=msg))
+        self._logger.debug("Editing and deleting {msg}".format(msg=msg))
         if not self._trial_run:
             comment.edit(replacement_text)
-            self._api_calls.append(int(time.time()))
 
     def _remove(self, item):
         if self._keep_a_copy and self._save_directory:
@@ -151,27 +124,20 @@ class Shredder(object):
         if self._clear_vote:
             try:
                 item.clear_vote()
-                self._api_calls.append(int(time.time()))
             except HTTPException:
                 self._logger.debug("Couldn't clear vote on {item}".format(item=item))
         if isinstance(item, Submission):
             self._remove_submission(item)
         elif isinstance(item, Comment):
             self._remove_comment(item)
-        if not self._edit_only and not self._trial_run:
+        if not self._trial_run:
             item.delete()
-            self._api_calls.append(int(time.time()))
 
     def _remove_things(self, items):
         self._logger.info("Loading items to delete...")
         to_delete = [item for item in items]
         self._logger.info("Done. Starting on batch of {} items...".format(len(to_delete)))
         for idx, item in enumerate(to_delete):
-            minute_ago = arrow.now().replace(minutes=-1).timestamp
-            self._api_calls = [api_call for api_call in self._api_calls if api_call >= minute_ago]
-            if len(self._api_calls) >= 60:
-                self._logger.info("Sleeping 10 seconds to wait out API cooldown...")
-                time.sleep(10)
             self._logger.debug("Examining item {}: {}".format(idx + 1, item))
             created = arrow.get(item.created_utc)
             if str(item.subreddit).lower() in self._blacklist:
@@ -190,12 +156,20 @@ class Shredder(object):
                 self._remove(item)
         return idx + 1
 
-    def _get_things(self):
+    def _build_iterator(self):
+        item = self._r.user.me()
         if self._item == "comments":
-            return self._r.user.get_comments(limit=self._limit, sort=self._sort)
+            item = item.comments
         elif self._item == "submitted":
-            return self._r.user.get_submitted(limit=self._limit, sort=self._sort)
-        elif self._item == "overview":
-            return self._r.user.get_overview(limit=self._limit, sort=self._sort)
+            item = item.submissions
+
+        if self._sort == "new":
+            return item.new(limit=None)
+        elif self._sort == "top":
+            return item.top(limit=None)
+        elif self._sort == "hot":
+            return item.hot(limit=None)
+        elif self._sort == "controversial":
+            return item.controversial(limit=None)
         else:
-            raise Exception("Your deletion section is wrong")
+            raise ShredditError("Sorting \"{}\" not recognized.".format(self._sort))
