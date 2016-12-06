@@ -4,7 +4,7 @@ from setuptools import setup
 from codecs import open
 from os import path
 
-VERSION = "5.0.1"
+VERSION = "5.0.2"
 DESCRIPTION = " Remove your comment history on Reddit as deleting an account does not do so."
 
 here = path.abspath(path.dirname(__file__))
