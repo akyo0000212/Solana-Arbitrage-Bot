@@ -1,8 +1,8 @@
 ---
-# Login details for Reddit. Fill out if you don't wish
-# to be prompted for a login every time you run Shreddit.
-# If your username or password has characters that could cause problems, surround them in quotes.
-### NOTE: This may be deprecated as you can specify in praw.ini instead
+# Credentials go here. If you are unsure what to put in client_id and client_secret, please consult the README for more
+# information.
+client_id: 
+client_secret: 
 username:
 password:
 
