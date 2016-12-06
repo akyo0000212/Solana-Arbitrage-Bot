@@ -45,10 +45,6 @@ multi_whitelist: []
 # but the output from the program will be shown as an example
 trial_run: False
 
-# Don't delete but *do* edit, could prove... interesting to see a comment
-# with 5000 upvotes and it's just a lorem ipsum!
-edit_only: False
-
 # Ignore distinguished comments.
 whitelist_distinguished: True
 
