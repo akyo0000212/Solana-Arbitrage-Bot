@@ -24,7 +24,7 @@ setup(
                  "Intended Audience :: End Users/Desktop",
                  "Programming Language :: Python"],
     packages=["shreddit"],
-    install_requires=["arrow", "backports-abc", "praw", "PyYAML", "requests", "six", "tornado"],
+    install_requires=["arrow", "backports-abc", "praw<4", "PyYAML", "requests", "six", "tornado"],
     package_data={"shreddit": ["shreddit.yml.example"]},
     entry_points={
         "console_scripts": [
