@@ -10,11 +10,11 @@ prior to deletion. In fact you can actually turn off deletion all together and j
 about Shreddit) but this will increase how long it takes the script to run as it will be going over all of your messages
 every run.
 
-## User Login deprecation
+## Important New Changes (as of Dec 2016)
 
-Reddit intends to disable username-password based authentication to access its APIs in the near future. You can specify
-your username and password in the `shreddit.yml` or the `praw.ini` to make it work **FOR NOW**. But consider looking at
-the [OAuth2 instructions](#oauth2-instructions) if you intend to use this program in the future.
+Due to deprecation of the PRAW 3.x library, Shreddit is using PRAW 4. This requires that OAuth be used to authenticate.
+Thankfully, however, it is much easier than in previous versions. If you are upgrading, [please review the usage section
+to ensure that you have set up credentials correctly.](#configuring-credentials)
 
 ## Pip Installation
 
@@ -31,10 +31,52 @@ installation.
 
 ## Usage
 
-After installing the `shreddit` command line utility, the first step is setting up the tool's configuration file. Simply
-typing `shreddit` will print a message with an example config. Copy the message from `---` onwards and save it as
-`shreddit.yml`. Now, the tool may be used by simply typing `shreddit` from this directory. Alternatively, if you named
-the configuration file something different such as `config.yml`, you may use it with `shreddit -c config.yml`.
+After installing the `shreddit` command line utility, the first step is setting up the tool's configuration files.
+Simply typing `shreddit -g` will generate configs. After configuring credentials, running the tool with the `shreddit`
+command will begin the tool's operation.
+
+### Configuring Credentials
+
+Running `shreddit -g` will generate a blank praw.ini file that looks like this:
+
+```
+# Credentials go here. Fill out default, or provide one or more names and call shreddit with the -u option to specify
+# which set to use.
+[default]
+client_id=
+client_secret=
+username=
+password=
+```
+
+Username and password are simply your Reddit login credentials for the account that will be used. However, to obtain the
+client ID and secret, follow these steps (taken from 
+[PRAW documentation](http://praw.readthedocs.io/en/latest/getting_started/authentication.html#script-application):
+
+1. Open your Reddit application preferences by clicking [here](https://www.reddit.com/prefs/apps/)
+2. Add a new application. It doesn't matter what it's named, but calling it "shreddit" makes it easier to remember
+3. Select "script"
+4. Redirect URL does not matter, so enter something like http://127.0.0.1:8080
+5. Once created, you should see the name of your application followed by 14 character string. Enter this 14 character
+   string as your `client_id`.
+6. Copy the 27 character "secret" string into the `client_secret` field.
+
+Finally, your praw.ini should look like this (with fake data provided here):
+
+```
+[default]
+client_id=f3FaKeD4t40PsJ
+client_secret=dfK3pfMoReFAkEDaTa123456789
+username=testuser
+password=123passwordgoeshere123
+```
+
+Keep your praw.ini either in the current directory when running `shreddit`, or in one of the config folders
+[described here](http://praw.readthedocs.io/en/latest/getting_started/configuration/prawini.html) such as
+`~/.config` in Linux or `%APPDATA%` in Windows.
+
+To use more than one account, you can add multiple profiles instead of just `[default]` and use the `-u` option to 
+`shreddit` to choose which one each time.
 
 ### Automating
 
@@ -42,6 +84,9 @@ The easiest way to automate this tool after the first run is by using the cron u
 user's crontab settings.
 
 **Examples:**
+
+The following examples require that the PRAW configuration file is located in the config directory. See [this PRAW
+documentation](http://praw.readthedocs.io/en/latest/getting_started/configuration/prawini.html) for more information.
 
 - Run every hour on the hour
         `0 * * * * shreddit -c <full path to shreddit.yml>`
@@ -60,7 +105,7 @@ If virtualenv was used, be sure to add `source /full/path/to/venv/bin/activate &
 
 ```
 $ shreddit --help
-usage: shreddit [-h] [-c CONFIG] [-p PRAW] [-t]
+usage: app.py [-h] [-c CONFIG] [-g] [-u USER]
 
 Command-line frontend to the shreddit library.
 
@@ -68,8 +113,10 @@ optional arguments:
   -h, --help            show this help message and exit
   -c CONFIG, --config CONFIG
                         Config file to use instead of the default shreddit.yml
-  -p PRAW, --praw PRAW  PRAW config (if not ./praw.ini)
-  -t, --test-oauth      Perform OAuth test and exit
+  -g, --generate-configs
+                        Write shreddit and praw config files to current
+                        directory.
+  -u USER, --user USER  User section from praw.ini if not default
 ```
 
 ## For Windows users
@@ -81,23 +128,6 @@ optional arguments:
 3. Open a new command prompt and verify that the `shreddit` command works before moving on to the [usage](#usage)
    section.
 
-## OAuth2 Instructions
-
-1. Visit: https://www.reddit.com/prefs/apps
-2. Click on 'Create app'.
-        - Fill in the name and select the 'script' option
-        - Under "redirect uri" put http://127.0.0.1:65010
-3. Copy from or rename `praw.ini.example` to `praw.ini` and open it. Enter the values from the Reddit page.
-        - oauth\_client\_id = { The ID displayed next to the icon thingy (under
-      "personal use script") }
-        - oauth\_client\_secret = { The secret }
-        - oauth\_redirect\_uri = http://127.0.0.1:65010
-        - Save the file.
-4. Run `python get_secret.py` in the command prompt.
-5. Your browser will open to a page on Reddit listing requested permissions.
-6. Click 'Allow'.
-
-
 ## Caveats
 
 - Certain limitations in the Reddit API and the PRAW library make it difficult to delete more than 1,000 comments.
@@ -105,3 +135,4 @@ optional arguments:
 
 - We are relying on Reddit admin words that they do not store edits, deleted posts are still stored in the database
   they are merely inaccessible to the public.
+
