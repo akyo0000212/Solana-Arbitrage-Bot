@@ -32,9 +32,6 @@ def main():
     if not os.path.isfile(config_filename):
         print("No shreddit configuration file was found or provided. Run this script with -g to generate one.")
         return
-    if not os.path.isfile("praw.ini"):
-        print("No praw configuration file was found. Run this script with -g to generate one.")
-        return
 
     with open(config_filename) as fh:
         # Not doing a simple update() here because it's preferable to only set attributes that are "whitelisted" as
