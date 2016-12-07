@@ -137,8 +137,10 @@ class Shredder(object):
         self._logger.info("Loading items to delete...")
         to_delete = [item for item in items]
         self._logger.info("Done. Starting on batch of {} items...".format(len(to_delete)))
-        for idx, item in enumerate(to_delete):
-            self._logger.debug("Examining item {}: {}".format(idx + 1, item))
+        count = 0
+        for item in to_delete:
+            count += 1
+            self._logger.debug("Examining item {}: {}".format(count, item))
             created = arrow.get(item.created_utc)
             if str(item.subreddit).lower() in self._blacklist:
                 self._logger.debug("Deleting due to blacklist")
@@ -154,7 +156,7 @@ class Shredder(object):
                 continue
             else:
                 self._remove(item)
-        return idx + 1
+        return count
 
     def _build_iterator(self):
         item = self._r.user.me()
