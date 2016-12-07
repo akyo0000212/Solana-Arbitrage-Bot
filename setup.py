@@ -25,7 +25,7 @@ setup(
                  "Programming Language :: Python"],
     packages=["shreddit"],
     install_requires=["arrow", "backports-abc", "praw>=4", "prawcore", "PyYAML", "requests", "six", "tornado"],
-    package_data={"shreddit": ["shreddit.yml.example"]},
+    package_data={"shreddit": ["*.example"]},
     entry_points={
         "console_scripts": [
             "shreddit=shreddit.app:main"

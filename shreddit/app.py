@@ -12,14 +12,28 @@ from shreddit.shredder import Shredder
 def main():
     parser = argparse.ArgumentParser(description="Command-line frontend to the shreddit library.")
     parser.add_argument("-c", "--config", help="Config file to use instead of the default shreddit.yml")
+    parser.add_argument("-g", "--generate-configs", help="Write shreddit and praw config files to current directory.",
+                        action="store_true")
     parser.add_argument("-u", "--user", help="User section from praw.ini if not default", default="default")
     args = parser.parse_args()
 
+    if args.generate_configs:
+        if not os.path.isfile("shreddit.yml"):
+            print("Writing shreddit.yml file...")
+            with open("shreddit.yml", "w") as fout:
+                fout.write(pkg_resources.resource_string("shreddit", "shreddit.yml.example"))
+        if not os.path.isfile("praw.ini"):
+            print("Writing praw.ini file...")
+            with open("praw.ini", "w") as fout:
+                fout.write(pkg_resources.resource_string("shreddit", "praw.ini.example"))
+        return
+
     config_filename = args.config or "shreddit.yml"
     if not os.path.isfile(config_filename):
-        print("No configuration file could be found. Paste the following into a file called \"shreddit.yml\" and " \
-                "try running shreddit again:\n\n")
-        print(pkg_resources.resource_string("shreddit", "shreddit.yml.example"))
+        print("No shreddit configuration file was found or provided. Run this script with -g to generate one.")
+        return
+    if not os.path.isfile("praw.ini"):
+        print("No praw configuration file was found. Run this script with -g to generate one.")
         return
 
     with open(config_filename) as fh:
