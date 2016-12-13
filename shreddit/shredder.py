@@ -97,8 +97,12 @@ class Shredder(object):
         return False
 
     def _save_item(self, item):
-        with open(os.path.join(self._save_directory, item.id), "w") as fh:
-            json.dump(item.json_dict, fh)
+        with open(os.path.join(self._save_directory, "{}.json".format(item.id)), "w") as fh:
+            # This is a temporary replacement for the old .json_dict property:
+            output = {k: item.__dict__[k] for k in item.__dict__ if not k.startswith("_")}
+            output["subreddit"] = output["subreddit"].title
+            output["author"] = output["author"].name
+            json.dump(output, fh)
 
     def _remove_submission(self, sub):
         self._logger.info("Deleting submission: #{id} {url}".format(id=sub.id, url=sub.url.encode("utf-8")))
