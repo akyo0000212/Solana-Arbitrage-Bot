@@ -21,3 +21,11 @@ except ImportError:
         words = LOREM.split()
         random.shuffle(words)
         return " ".join(words)
+
+
+class ShredditError(Exception):
+    def __init__(self, value=None):
+        self.value = value if value else "No information provided"
+
+    def __str__(self):
+        return repr(self.value)
