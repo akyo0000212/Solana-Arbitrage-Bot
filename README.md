@@ -49,6 +49,9 @@ username=
 password=
 ```
 
+**You must provide values for each of these.** As strange as it may seem to provide both a username/password pair *and*
+a client id/secret pair, that is how the Reddit API does "OAuth" script applications.
+
 Username and password are simply your Reddit login credentials for the account that will be used. However, to obtain the
 client ID and secret, follow these steps (taken from 
 [PRAW documentation](http://praw.readthedocs.io/en/latest/getting_started/authentication.html#script-application)):
@@ -56,7 +59,7 @@ client ID and secret, follow these steps (taken from
 1. Open your Reddit application preferences by clicking [here](https://www.reddit.com/prefs/apps/).
 2. Add a new application. It doesn't matter what it's named, but calling it "shreddit" makes it easier to remember.
 3. Select "script".
-4. Redirect URL does not matter, so enter something like http://127.0.0.1:8080
+4. Redirect URL does not matter for script applications, so enter something like http://127.0.0.1:8080
 5. Once created, you should see the name of your application followed by 14 character string. Enter this 14 character
    string as your `client_id`.
 6. Copy the 27 character "secret" string into the `client_secret` field.
