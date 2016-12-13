@@ -1,11 +1,4 @@
 ---
-# Login details for Reddit. Fill out if you don't wish
-# to be prompted for a login every time you run Shreddit.
-# If your username or password has characters that could cause problems, surround them in quotes.
-### NOTE: This may be deprecated as you can specify in praw.ini instead
-username:
-password:
-
 # How many hours of comments you want to keep
 # 24 hours in a day,
 # 168 hours in a week,
@@ -51,10 +44,6 @@ multi_whitelist: []
 # If you set this then no editing or deleting will be done
 # but the output from the program will be shown as an example
 trial_run: False
-
-# Don't delete but *do* edit, could prove... interesting to see a comment
-# with 5000 upvotes and it's just a lorem ipsum!
-edit_only: False
 
 # Ignore distinguished comments.
 whitelist_distinguished: True

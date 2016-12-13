@@ -6,26 +6,31 @@ import logging
 import os
 import pkg_resources
 from shreddit import default_config
-from shreddit.oauth import oauth_test
 from shreddit.shredder import Shredder
 
 
 def main():
     parser = argparse.ArgumentParser(description="Command-line frontend to the shreddit library.")
     parser.add_argument("-c", "--config", help="Config file to use instead of the default shreddit.yml")
-    parser.add_argument("-p", "--praw", help="PRAW config (if not ./praw.ini)")
-    parser.add_argument("-t", "--test-oauth", help="Perform OAuth test and exit", action="store_true")
+    parser.add_argument("-g", "--generate-configs", help="Write shreddit and praw config files to current directory.",
+                        action="store_true")
+    parser.add_argument("-u", "--user", help="User section from praw.ini if not default", default="default")
     args = parser.parse_args()
 
-    if args.test_oauth:
-        oauth_test(args.praw)
+    if args.generate_configs:
+        if not os.path.isfile("shreddit.yml"):
+            print("Writing shreddit.yml file...")
+            with open("shreddit.yml", "wb") as fout:
+                fout.write(pkg_resources.resource_string("shreddit", "shreddit.yml.example"))
+        if not os.path.isfile("praw.ini"):
+            print("Writing praw.ini file...")
+            with open("praw.ini", "wb") as fout:
+                fout.write(pkg_resources.resource_string("shreddit", "praw.ini.example"))
         return
 
     config_filename = args.config or "shreddit.yml"
     if not os.path.isfile(config_filename):
-        print("No configuration file could be found. Paste the following into a file called \"shreddit.yml\" and " \
-                "try running shreddit again:\n\n")
-        print(pkg_resources.resource_string("shreddit", "shreddit.yml.example"))
+        print("No shreddit configuration file was found or provided. Run this script with -g to generate one.")
         return
 
     with open(config_filename) as fh:
@@ -36,8 +41,7 @@ def main():
             if option in user_config:
                 default_config[option] = user_config[option]
 
-    # TODO: Validate config options
-    shredder = Shredder(default_config, args.praw)
+    shredder = Shredder(default_config, args.user)
     shredder.shred()
 
 
