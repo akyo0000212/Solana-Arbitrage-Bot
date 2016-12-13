@@ -20,11 +20,11 @@ def main():
     if args.generate_configs:
         if not os.path.isfile("shreddit.yml"):
             print("Writing shreddit.yml file...")
-            with open("shreddit.yml", "w") as fout:
+            with open("shreddit.yml", "wb") as fout:
                 fout.write(pkg_resources.resource_string("shreddit", "shreddit.yml.example"))
         if not os.path.isfile("praw.ini"):
             print("Writing praw.ini file...")
-            with open("praw.ini", "w") as fout:
+            with open("praw.ini", "wb") as fout:
                 fout.write(pkg_resources.resource_string("shreddit", "praw.ini.example"))
         return
 
