@@ -24,7 +24,8 @@ class Shredder(object):
         self._logger.setLevel(level=logging.DEBUG if config.get("verbose", True) else logging.INFO)
         self.__dict__.update({"_{}".format(k): config[k] for k in config})
 
-        self._connect(user)
+        self._user = user
+        self._connect()
 
         if self._save_directory:
             self._r.config.store_json_result = True
@@ -71,12 +72,12 @@ class Shredder(object):
             # while and do it again.
             self._logger.info("Waiting {} seconds and continuing...".format(self._batch_cooldown))
             time.sleep(self._batch_cooldown)
-            self._connect(None, self._username, self._password)
+            self._connect()
             self.shred()
 
-    def _connect(self, user):
+    def _connect(self):
         try:
-            self._r = praw.Reddit(user, user_agent="python:shreddit:v6.0.0")
+            self._r = praw.Reddit(self._user, user_agent="python:shreddit:v6.0.4")
             self._logger.info("Logged in as {user}.".format(user=self._r.user.me()))
         except ResponseException:
             raise ShredditError("Bad OAuth credentials")
