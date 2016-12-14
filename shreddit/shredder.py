@@ -9,7 +9,7 @@ import time
 import yaml
 from datetime import datetime, timedelta
 from praw.models import Comment, Submission
-from prawcore.exceptions import ResponseException, OAuthException
+from prawcore.exceptions import ResponseException, OAuthException, BadRequest
 from re import sub
 from shreddit.util import get_sentence, ShredditError
 
@@ -129,7 +129,7 @@ class Shredder(object):
         if self._clear_vote:
             try:
                 item.clear_vote()
-            except HTTPException:
+            except BadRequest:
                 self._logger.debug("Couldn't clear vote on {item}".format(item=item))
         if isinstance(item, Submission):
             self._remove_submission(item)
