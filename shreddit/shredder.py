@@ -77,7 +77,7 @@ class Shredder(object):
 
     def _connect(self):
         try:
-            self._r = praw.Reddit(self._user, user_agent="python:shreddit:v6.0.4")
+            self._r = praw.Reddit(self._user, check_for_updates=False, user_agent="python:shreddit:v6.0.4")
             self._logger.info("Logged in as {user}.".format(user=self._r.user.me()))
         except ResponseException:
             raise ShredditError("Bad OAuth credentials")
