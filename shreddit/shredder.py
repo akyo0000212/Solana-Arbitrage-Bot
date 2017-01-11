@@ -151,14 +151,14 @@ class Shredder(object):
                 self._logger.debug("Deleting due to blacklist")
                 count_removed += 1
                 self._remove(item)
-            elif self._check_whitelist(item):
-                self._logger.debug("Skipping due to: whitelisted")
-                continue
-            if created <= self._nuke_cutoff:
+            elif created <= self._nuke_cutoff:
                 self._logger.debug("Item occurs prior to nuke cutoff")
                 count_removed += 1
                 self._remove(item)
-            elif created > self._recent_cutoff:
+            elif self._check_whitelist(item):
+                self._logger.debug("Skipping due to: whitelisted")
+                continue
+	    elif created > self._recent_cutoff:
                 self._logger.debug("Skipping due to: too recent")
                 continue
             else:
