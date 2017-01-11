@@ -158,7 +158,7 @@ class Shredder(object):
             elif self._check_whitelist(item):
                 self._logger.debug("Skipping due to: whitelisted")
                 continue
-	    elif created > self._recent_cutoff:
+            elif created > self._recent_cutoff:
                 self._logger.debug("Skipping due to: too recent")
                 continue
             else:
