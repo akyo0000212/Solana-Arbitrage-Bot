@@ -39,14 +39,14 @@ class Shredder(object):
         # Add any multireddit subreddits to the whitelist
         self._whitelist = set([s.lower() for s in self._whitelist])
         for username, multiname in self._multi_whitelist:
-            multireddit = self._r.get_multireddit(username, multiname)
+            multireddit = self._r.multireddit(username, multiname)
             for subreddit in multireddit.subreddits:
                 self._whitelist.add(str(subreddit).lower())
 
         # Add any multireddit subreddits to the blacklist
         self._blacklist = set()
         for username, multiname in self._multi_blacklist:
-            multireddit = self._r.get_multireddit(username, multiname)
+            multireddit = self._r.multireddit(username, multiname)
             for subreddit in multireddit.subreddits:
                 self._blacklist.add(str(subreddit).lower())
 
