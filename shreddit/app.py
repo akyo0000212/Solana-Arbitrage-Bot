@@ -5,6 +5,7 @@ import yaml
 import logging
 import os
 import pkg_resources
+from appdirs import user_config_dir
 from shreddit import default_config
 from shreddit.shredder import Shredder
 
@@ -28,7 +29,15 @@ def main():
                 fout.write(pkg_resources.resource_string("shreddit", "praw.ini.example"))
         return
 
-    config_filename = args.config or "shreddit.yml"
+    config_dir = user_config_dir("shreddit/shreddit.yml")
+
+    if args.config:
+        config_filename = args.config
+    elif os.path.exists(config_dir):
+        config_filename = config_dir
+    else:
+        config_filename = "shreddit.yml"
+
     if not os.path.isfile(config_filename):
         print("No shreddit configuration file was found or provided. Run this script with -g to generate one.")
         return
