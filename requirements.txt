@@ -8,3 +8,4 @@ backports-abc==0.4
 tornado==4.3
 update-checker==0.15
 wheel==0.24.0
+appdirs==1.4.3
