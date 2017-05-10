@@ -98,7 +98,7 @@ class Shredder(object):
         return False
 
     def _save_item(self, item):
-        name = item.subreddit_name_prefixed[2:].lower()
+        name = item.subreddit_name_prefixed[2:]
         path = "{}/{}/{}.json".format(item.author, name, item.id)
         if not os.path.exists(os.path.join(self._save_directory, os.path.dirname(path))):
             os.makedirs(os.path.join(self._save_directory, os.path.dirname(path)))
