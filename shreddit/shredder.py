@@ -103,7 +103,7 @@ class Shredder(object):
             output = {k: item.__dict__[k] for k in item.__dict__ if not k.startswith("_")}
             output["subreddit"] = output["subreddit"].title
             output["author"] = output["author"].name
-            json.dump(output, fh)
+            json.dump(output, fh, indent=2)
 
     def _remove_submission(self, sub):
         self._logger.info("Deleting submission: #{id} {url}".format(id=sub.id, url=sub.url.encode("utf-8")))
