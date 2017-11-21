@@ -6,9 +6,7 @@ time until only those whitelisted remain. It allows you to maintain your normal 
 scrubbed after a certain amount of time.
 
 When it became known that post edits were *not* saved but post deletions *were* saved, code was added to edit your post
-prior to deletion. In fact you can actually turn off deletion all together and just have lorem ipsum (or a message
-about Shreddit) but this will increase how long it takes the script to run as it will be going over all of your messages
-every run.
+prior to deletion.
 
 ## Important New Changes (as of Dec 2016)
 
