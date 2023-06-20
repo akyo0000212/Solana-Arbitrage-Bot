@@ -147,8 +147,8 @@ Or (from the original author):
 
 - Uses a plaintext configuration by default; it might be nice to add some command line parameters for the authentication.
 
-- If you make changes to "shreddit.py", re-running "python setup.py install" will not fix it. You must directly replace
-  the file in the python libraries.
+- If you make changes to "shreddit.py", re-running "python setup.py install" will not update the `shreddit` command with
+  the new changes. You must directly replace the file in the python libraries.
 
 - The original author has not updated their repository in about 7 years (since 2016), and many of the requirement version
   from the packages in "requirements.txt" don't work. Most of these can be fixed by running
