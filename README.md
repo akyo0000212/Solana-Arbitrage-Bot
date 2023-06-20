@@ -10,13 +10,15 @@ prior to deletion. In fact you can actually turn off deletion all together and j
 about Shreddit) but this will increase how long it takes the script to run as it will be going over all of your messages
 every run.
 
-## Important New Changes (as of Dec 2016)
-
-Due to deprecation of the PRAW 3.x library, Shreddit is using PRAW 4. This requires that OAuth be used to authenticate.
-Thankfully, however, it is much easier than in previous versions. If you are upgrading, [please review the usage section
-to ensure that you have set up credentials correctly.](#configuring-credentials)
+I added some changes. Namely, the command will run to completion (ie, it's fire and forget now). I also took the liberty
+making the "batch_limit" configurable in the "shreddit.yaml" file. However, that option is pretty much unnecessary because
+I fixed the API limit error from breaking shreddit. Instead, the exception will be handled gracefully, and the process will
+continue until all comments and posts have been considered for deletion. 
 
 ## Pip Installation
+
+I personally recommend using the manual instructions. This is a forked brank of shreddit containing fixes not in the 
+main branch. Your mileage will vary if you use pip to install it.
 
 `pip install -U shreddit` will install the package and its dependencies, and it will add a `shreddit` command line
 utility to your PATH. This is typically either run in a virtualenv or using administrative privileges for global
@@ -28,6 +30,9 @@ installation.
 2. From the directory, run `pip install -r requirements.txt`
 3. Run `python setup.py install` to install the package and the `shreddit` command line utility.  This is typically
    either run in a virtualenv or using administrative privileges for global installation.
+
+Note: The original author limited some of the requirement versions for packages. I found most of those errors are
+resolved running "pip install <package-name> --upgrade".
 
 ## Usage
 
@@ -57,7 +62,7 @@ client ID and secret, follow these steps (taken from
 [PRAW documentation](http://praw.readthedocs.io/en/latest/getting_started/authentication.html#script-application)):
 
 1. Open your Reddit application preferences by clicking [here](https://www.reddit.com/prefs/apps/).
-2. Add a new application. It doesn't matter what it's named, but calling it "shreddit" makes it easier to remember.
+2. Add a new application. It doesn't matter what it's named, but calling it "shreddit" makes it easier to remember. The button will probably say something about being a developer, don't worry, its fine.
 3. Select "script".
 4. Redirect URL does not matter for script applications, so enter something like http://127.0.0.1:8080
 5. Once created, you should see the name of your application followed by 14 character string. Enter this 14 character
@@ -124,6 +129,10 @@ optional arguments:
 
 ## For Windows users
 
+I highly recommend installing WSL and using the manual installation instructions. 
+
+Or (from the original author):
+
 1. Make sure you have Python installed.
    [Click here for the Python download page](https://www.python.org/downloads/).
         - **Note:** Install either `python 2.x` or `python 3.x`, not both.
@@ -135,3 +144,15 @@ optional arguments:
 
 - We are relying on Reddit admin words that they do not store edits, deleted posts are still stored in the database
   they are merely inaccessible to the public.
+
+- Uses a plaintext configuration by default; it might be nice to add some command line parameters for the authentication.
+
+- If you make changes to "shreddit.py", re-running "python setup.py install" will not fix it. You must directly replace
+  the file in the python libraries.
+
+- The original author has not updated their repository in about 7 years (since 2016), and many of the requirement version
+  from the packages in "requirements.txt" don't work. Most of these can be fixed by running
+     - "pip install <package> --upgrade"
+
+- After July 1st, 2023; I have no idea if this will continue working without paying for API access (I think there is a
+  severely hampered "free" access to the API, so it might take longer to run after that date, or it might not at all)
