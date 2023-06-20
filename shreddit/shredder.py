@@ -150,7 +150,7 @@ class Shredder(object):
             except Exception as e:
                 self._logger.debug("Encountered a problem with the API, probably ratelimiting thanks to bad admins")
                 self._logger.error(f"Exception: {e}")
-                self._logger.error(f"Waiting {self._batch_cooldown} seconds")
+                self._logger.info(f"Waiting {self._batch_cooldown} seconds")
                 time.sleep(self._batch_cooldown)
 
     def _remove_things(self, items):
