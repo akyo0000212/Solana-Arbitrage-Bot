@@ -156,3 +156,5 @@ Or (from the original author):
 
 - After July 1st, 2023; I have no idea if this will continue working without paying for API access (I think there is a
   severely hampered "free" access to the API, so it might take longer to run after that date, or it might not at all)
+
+- The subreddit whitelist option seems to be case sensitive. I'd like to change this later.
