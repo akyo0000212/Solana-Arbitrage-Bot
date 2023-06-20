@@ -135,8 +135,3 @@ optional arguments:
 
 - We are relying on Reddit admin words that they do not store edits, deleted posts are still stored in the database
   they are merely inaccessible to the public.
-
-## Donate
-
-A few people have asked about donating so here's a Bitcoin address, any amount is appreciated, spread amongst recent 
-contributors and if there's enough interest a web service may be on the horizon! `1PbeYK7FonjVmgWxf4ieKmvwtomZR1K1Qu`
