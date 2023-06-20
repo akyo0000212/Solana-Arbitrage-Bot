@@ -18,7 +18,7 @@ class Shredder(object):
     """This class stores state for configuration, API objects, logging, etc. It exposes a shred() method that
     application code can call to start it.
     """
-    batch_size=1000
+    _batch_size=1000
 
     def __init__(self, config, user):
         logging.basicConfig()
@@ -69,7 +69,7 @@ class Shredder(object):
     def shred(self):
         deleted = self._remove_things(self._build_iterator())
         self._logger.info("Finished deleting {} items. ".format(deleted))
-        if deleted >= self.batch_size:
+        if deleted >= self._batch_size:
             # This user has more than 1000 items to handle, which angers the gods of the Reddit API. So chill for a
             # while and do it again.
             self._logger.info("Waiting {} seconds and continuing...".format(self._batch_cooldown))
