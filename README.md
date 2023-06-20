@@ -152,7 +152,7 @@ Or (from the original author):
 
 - The original author has not updated their repository in about 7 years (since 2016), and many of the requirement version
   from the packages in "requirements.txt" don't work. Most of these can be fixed by running
-     - "pip install <package> --upgrade"
+     - "pip install \<package\> --upgrade"
 
 - After July 1st, 2023; I have no idea if this will continue working without paying for API access (I think there is a
   severely hampered "free" access to the API, so it might take longer to run after that date, or it might not at all)
