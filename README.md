@@ -11,7 +11,7 @@ about Shreddit) but this will increase how long it takes the script to run as it
 every run.
 
 I added some changes. Namely, the command will run to completion (ie, it's fire and forget now). I also took the liberty
-making the "batch_limit" configurable in the "shreddit.yaml" file. However, that option is pretty much unnecessary because
+of making the "batch_limit" configurable in the "shreddit.yaml" file. However, that option is pretty much unnecessary because
 I fixed the API limit error from breaking shreddit. Instead, the exception will be handled gracefully, and the process will
 continue until all comments and posts have been considered for deletion. 
 
