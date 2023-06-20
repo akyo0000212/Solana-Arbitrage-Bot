@@ -133,9 +133,6 @@ optional arguments:
 
 ## Caveats
 
-- Certain limitations in the Reddit API and the PRAW library make it difficult to delete more than 1,000 comments.
-  While deleting >1000 comments is planned, it is necessary right now to rerun the program until they are all deleted.
-
 - We are relying on Reddit admin words that they do not store edits, deleted posts are still stored in the database
   they are merely inaccessible to the public.
 
