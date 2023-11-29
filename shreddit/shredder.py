@@ -139,7 +139,7 @@ class Shredder(object):
                         try:
                             item.clear_vote()
                         except BadRequest:
-                            self._logger.debug("Couldn't clear vote on {item}".format(item=item))
+                            self._logger.debug(f"Couldn't clear vote on {item}")
                 if isinstance(item, Submission):
                     self._remove_submission(item)
                 elif isinstance(item, Comment):
