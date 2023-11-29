@@ -147,7 +147,7 @@ class Shredder(object):
                 if not self._trial_run:
                     item.delete()
                 break
-            except Exception as e:
+            except BadRequest as e:
                 self._logger.debug(
                     '''Encountered a problem with the API,
                     probably ratelimiting thanks to bad admins'''
