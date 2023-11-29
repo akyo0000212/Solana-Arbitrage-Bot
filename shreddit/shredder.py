@@ -148,7 +148,10 @@ class Shredder(object):
                     item.delete()
                 break
             except Exception as e:
-                self._logger.debug("Encountered a problem with the API, probably ratelimiting thanks to bad admins")
+                self._logger.debug(
+                    '''Encountered a problem with the API,
+                    probably ratelimiting thanks to bad admins'''
+                )
                 self._logger.error(f"Exception: {e}")
                 self._logger.info(f"Waiting {self._batch_cooldown} seconds")
                 time.sleep(self._batch_cooldown)
