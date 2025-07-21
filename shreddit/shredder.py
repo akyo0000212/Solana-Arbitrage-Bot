@@ -18,12 +18,14 @@ class Shredder(object):
     """This class stores state for configuration, API objects, logging, etc. It exposes a shred() method that
     application code can call to start it.
     """
+    _batch_size=1000
+
     def __init__(self, config, user):
         logging.basicConfig()
         self._logger = logging.getLogger("shreddit")
         self._logger.setLevel(level=logging.DEBUG if config.get("verbose", True) else logging.INFO)
         self.__dict__.update({"_{}".format(k): config[k] for k in config})
-
+        self._batch_size = config.get("batch_size", 1000)
         self._user = user
         self._connect()
 
@@ -67,7 +69,7 @@ class Shredder(object):
     def shred(self):
         deleted = self._remove_things(self._build_iterator())
         self._logger.info("Finished deleting {} items. ".format(deleted))
-        if deleted >= 1000:
+        if deleted >= self._batch_size:
             # This user has more than 1000 items to handle, which angers the gods of the Reddit API. So chill for a
             # while and do it again.
             self._logger.info("Waiting {} seconds and continuing...".format(self._batch_cooldown))
@@ -128,20 +130,31 @@ class Shredder(object):
             comment.edit(replacement_text)
 
     def _remove(self, item):
-        if self._keep_a_copy and self._save_directory:
-            self._save_item(item)
-        if not self._trial_run:
-            if self._clear_vote:
-                try:
-                    item.clear_vote()
-                except BadRequest:
-                    self._logger.debug("Couldn't clear vote on {item}".format(item=item))
-        if isinstance(item, Submission):
-            self._remove_submission(item)
-        elif isinstance(item, Comment):
-            self._remove_comment(item)
-        if not self._trial_run:
-            item.delete()
+        while 1:
+            try:
+                if self._keep_a_copy and self._save_directory:
+                    self._save_item(item)
+                if not self._trial_run:
+                    if self._clear_vote:
+                        try:
+                            item.clear_vote()
+                        except BadRequest:
+                            self._logger.debug(f"Couldn't clear vote on {item}")
+                if isinstance(item, Submission):
+                    self._remove_submission(item)
+                elif isinstance(item, Comment):
+                    self._remove_comment(item)
+                if not self._trial_run:
+                    item.delete()
+                break
+            except BadRequest as e:
+                self._logger.debug(
+                    '''Encountered a problem with the API,
+                    probably ratelimiting thanks to bad admins'''
+                )
+                self._logger.error(f"Exception: {e}")
+                self._logger.info(f"Waiting {self._batch_cooldown} seconds")
+                time.sleep(self._batch_cooldown)
 
     def _remove_things(self, items):
         self._logger.info("Loading items to delete...")
