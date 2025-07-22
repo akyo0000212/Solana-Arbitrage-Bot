@@ -3,7 +3,7 @@ arrow==0.10.0
 backports-abc==0.5
 certifi==2017.4.17
 chardet==3.0.4
-idna==2.5
+idna==3.7
 praw==5.0.0
 prawcore==0.11.0
 python-dateutil==2.6.0
