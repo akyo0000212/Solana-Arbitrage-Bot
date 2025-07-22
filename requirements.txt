@@ -11,6 +11,6 @@ PyYAML
 requests
 shreddit==6.0.7
 six==1.10.0
-tornado==4.5.1
+tornado==6.5
 update-checker==0.16
 urllib3
