@@ -1,7 +1,7 @@
 appdirs==1.4.3
 arrow==0.10.0
 backports-abc==0.5
-certifi==2017.4.17
+certifi==2024.7.4
 chardet==3.0.4
 idna==3.7
 praw==5.0.0
